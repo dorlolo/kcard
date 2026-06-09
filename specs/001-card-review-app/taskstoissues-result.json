@@ -1,0 +1,638 @@
+{
+  "total_tasks": 157,
+  "existing_skipped": 0,
+  "created": 157,
+  "failed": 0,
+  "skipped_ids": [],
+  "created_issues": [
+    {
+      "id": "T001",
+      "url": "https://github.com/dorlolo/kcard/issues/1"
+    },
+    {
+      "id": "T002",
+      "url": "https://github.com/dorlolo/kcard/issues/2"
+    },
+    {
+      "id": "T003",
+      "url": "https://github.com/dorlolo/kcard/issues/3"
+    },
+    {
+      "id": "T004",
+      "url": "https://github.com/dorlolo/kcard/issues/4"
+    },
+    {
+      "id": "T005",
+      "url": "https://github.com/dorlolo/kcard/issues/5"
+    },
+    {
+      "id": "T006",
+      "url": "https://github.com/dorlolo/kcard/issues/6"
+    },
+    {
+      "id": "T007",
+      "url": "https://github.com/dorlolo/kcard/issues/7"
+    },
+    {
+      "id": "T008",
+      "url": "https://github.com/dorlolo/kcard/issues/8"
+    },
+    {
+      "id": "T009",
+      "url": "https://github.com/dorlolo/kcard/issues/9"
+    },
+    {
+      "id": "T010",
+      "url": "https://github.com/dorlolo/kcard/issues/10"
+    },
+    {
+      "id": "T011",
+      "url": "https://github.com/dorlolo/kcard/issues/11"
+    },
+    {
+      "id": "T012",
+      "url": "https://github.com/dorlolo/kcard/issues/12"
+    },
+    {
+      "id": "T013",
+      "url": "https://github.com/dorlolo/kcard/issues/13"
+    },
+    {
+      "id": "T014",
+      "url": "https://github.com/dorlolo/kcard/issues/14"
+    },
+    {
+      "id": "T015",
+      "url": "https://github.com/dorlolo/kcard/issues/15"
+    },
+    {
+      "id": "T016",
+      "url": "https://github.com/dorlolo/kcard/issues/16"
+    },
+    {
+      "id": "T017",
+      "url": "https://github.com/dorlolo/kcard/issues/17"
+    },
+    {
+      "id": "T018",
+      "url": "https://github.com/dorlolo/kcard/issues/18"
+    },
+    {
+      "id": "T019",
+      "url": "https://github.com/dorlolo/kcard/issues/19"
+    },
+    {
+      "id": "T020",
+      "url": "https://github.com/dorlolo/kcard/issues/20"
+    },
+    {
+      "id": "T021",
+      "url": "https://github.com/dorlolo/kcard/issues/21"
+    },
+    {
+      "id": "T022",
+      "url": "https://github.com/dorlolo/kcard/issues/22"
+    },
+    {
+      "id": "T023",
+      "url": "https://github.com/dorlolo/kcard/issues/23"
+    },
+    {
+      "id": "T024",
+      "url": "https://github.com/dorlolo/kcard/issues/24"
+    },
+    {
+      "id": "T025",
+      "url": "https://github.com/dorlolo/kcard/issues/25"
+    },
+    {
+      "id": "T026",
+      "url": "https://github.com/dorlolo/kcard/issues/26"
+    },
+    {
+      "id": "T027",
+      "url": "https://github.com/dorlolo/kcard/issues/27"
+    },
+    {
+      "id": "T028",
+      "url": "https://github.com/dorlolo/kcard/issues/28"
+    },
+    {
+      "id": "T029",
+      "url": "https://github.com/dorlolo/kcard/issues/29"
+    },
+    {
+      "id": "T030",
+      "url": "https://github.com/dorlolo/kcard/issues/30"
+    },
+    {
+      "id": "T031",
+      "url": "https://github.com/dorlolo/kcard/issues/31"
+    },
+    {
+      "id": "T032",
+      "url": "https://github.com/dorlolo/kcard/issues/32"
+    },
+    {
+      "id": "T033",
+      "url": "https://github.com/dorlolo/kcard/issues/33"
+    },
+    {
+      "id": "T034",
+      "url": "https://github.com/dorlolo/kcard/issues/34"
+    },
+    {
+      "id": "T035",
+      "url": "https://github.com/dorlolo/kcard/issues/35"
+    },
+    {
+      "id": "T036",
+      "url": "https://github.com/dorlolo/kcard/issues/36"
+    },
+    {
+      "id": "T037",
+      "url": "https://github.com/dorlolo/kcard/issues/37"
+    },
+    {
+      "id": "T038",
+      "url": "https://github.com/dorlolo/kcard/issues/38"
+    },
+    {
+      "id": "T039",
+      "url": "https://github.com/dorlolo/kcard/issues/39"
+    },
+    {
+      "id": "T040",
+      "url": "https://github.com/dorlolo/kcard/issues/40"
+    },
+    {
+      "id": "T041",
+      "url": "https://github.com/dorlolo/kcard/issues/41"
+    },
+    {
+      "id": "T042",
+      "url": "https://github.com/dorlolo/kcard/issues/42"
+    },
+    {
+      "id": "T043",
+      "url": "https://github.com/dorlolo/kcard/issues/43"
+    },
+    {
+      "id": "T044",
+      "url": "https://github.com/dorlolo/kcard/issues/44"
+    },
+    {
+      "id": "T045",
+      "url": "https://github.com/dorlolo/kcard/issues/45"
+    },
+    {
+      "id": "T046",
+      "url": "https://github.com/dorlolo/kcard/issues/46"
+    },
+    {
+      "id": "T047",
+      "url": "https://github.com/dorlolo/kcard/issues/47"
+    },
+    {
+      "id": "T048",
+      "url": "https://github.com/dorlolo/kcard/issues/48"
+    },
+    {
+      "id": "T049",
+      "url": "https://github.com/dorlolo/kcard/issues/49"
+    },
+    {
+      "id": "T050",
+      "url": "https://github.com/dorlolo/kcard/issues/50"
+    },
+    {
+      "id": "T051",
+      "url": "https://github.com/dorlolo/kcard/issues/51"
+    },
+    {
+      "id": "T052",
+      "url": "https://github.com/dorlolo/kcard/issues/52"
+    },
+    {
+      "id": "T053",
+      "url": "https://github.com/dorlolo/kcard/issues/53"
+    },
+    {
+      "id": "T054",
+      "url": "https://github.com/dorlolo/kcard/issues/54"
+    },
+    {
+      "id": "T055",
+      "url": "https://github.com/dorlolo/kcard/issues/55"
+    },
+    {
+      "id": "T056",
+      "url": "https://github.com/dorlolo/kcard/issues/56"
+    },
+    {
+      "id": "T057",
+      "url": "https://github.com/dorlolo/kcard/issues/57"
+    },
+    {
+      "id": "T058",
+      "url": "https://github.com/dorlolo/kcard/issues/58"
+    },
+    {
+      "id": "T059",
+      "url": "https://github.com/dorlolo/kcard/issues/59"
+    },
+    {
+      "id": "T060",
+      "url": "https://github.com/dorlolo/kcard/issues/60"
+    },
+    {
+      "id": "T061",
+      "url": "https://github.com/dorlolo/kcard/issues/61"
+    },
+    {
+      "id": "T062",
+      "url": "https://github.com/dorlolo/kcard/issues/62"
+    },
+    {
+      "id": "T063",
+      "url": "https://github.com/dorlolo/kcard/issues/63"
+    },
+    {
+      "id": "T064",
+      "url": "https://github.com/dorlolo/kcard/issues/64"
+    },
+    {
+      "id": "T065",
+      "url": "https://github.com/dorlolo/kcard/issues/65"
+    },
+    {
+      "id": "T066",
+      "url": "https://github.com/dorlolo/kcard/issues/66"
+    },
+    {
+      "id": "T067",
+      "url": "https://github.com/dorlolo/kcard/issues/67"
+    },
+    {
+      "id": "T068",
+      "url": "https://github.com/dorlolo/kcard/issues/68"
+    },
+    {
+      "id": "T069",
+      "url": "https://github.com/dorlolo/kcard/issues/69"
+    },
+    {
+      "id": "T070",
+      "url": "https://github.com/dorlolo/kcard/issues/70"
+    },
+    {
+      "id": "T071",
+      "url": "https://github.com/dorlolo/kcard/issues/71"
+    },
+    {
+      "id": "T072",
+      "url": "https://github.com/dorlolo/kcard/issues/72"
+    },
+    {
+      "id": "T073",
+      "url": "https://github.com/dorlolo/kcard/issues/73"
+    },
+    {
+      "id": "T074",
+      "url": "https://github.com/dorlolo/kcard/issues/74"
+    },
+    {
+      "id": "T075",
+      "url": "https://github.com/dorlolo/kcard/issues/75"
+    },
+    {
+      "id": "T076",
+      "url": "https://github.com/dorlolo/kcard/issues/76"
+    },
+    {
+      "id": "T077",
+      "url": "https://github.com/dorlolo/kcard/issues/77"
+    },
+    {
+      "id": "T078",
+      "url": "https://github.com/dorlolo/kcard/issues/78"
+    },
+    {
+      "id": "T079",
+      "url": "https://github.com/dorlolo/kcard/issues/79"
+    },
+    {
+      "id": "T080",
+      "url": "https://github.com/dorlolo/kcard/issues/80"
+    },
+    {
+      "id": "T081",
+      "url": "https://github.com/dorlolo/kcard/issues/81"
+    },
+    {
+      "id": "T082",
+      "url": "https://github.com/dorlolo/kcard/issues/82"
+    },
+    {
+      "id": "T083",
+      "url": "https://github.com/dorlolo/kcard/issues/83"
+    },
+    {
+      "id": "T084",
+      "url": "https://github.com/dorlolo/kcard/issues/84"
+    },
+    {
+      "id": "T085",
+      "url": "https://github.com/dorlolo/kcard/issues/85"
+    },
+    {
+      "id": "T086",
+      "url": "https://github.com/dorlolo/kcard/issues/86"
+    },
+    {
+      "id": "T087",
+      "url": "https://github.com/dorlolo/kcard/issues/87"
+    },
+    {
+      "id": "T088",
+      "url": "https://github.com/dorlolo/kcard/issues/88"
+    },
+    {
+      "id": "T089",
+      "url": "https://github.com/dorlolo/kcard/issues/89"
+    },
+    {
+      "id": "T090",
+      "url": "https://github.com/dorlolo/kcard/issues/90"
+    },
+    {
+      "id": "T091",
+      "url": "https://github.com/dorlolo/kcard/issues/91"
+    },
+    {
+      "id": "T092",
+      "url": "https://github.com/dorlolo/kcard/issues/92"
+    },
+    {
+      "id": "T093",
+      "url": "https://github.com/dorlolo/kcard/issues/93"
+    },
+    {
+      "id": "T094",
+      "url": "https://github.com/dorlolo/kcard/issues/94"
+    },
+    {
+      "id": "T095",
+      "url": "https://github.com/dorlolo/kcard/issues/95"
+    },
+    {
+      "id": "T096",
+      "url": "https://github.com/dorlolo/kcard/issues/96"
+    },
+    {
+      "id": "T097",
+      "url": "https://github.com/dorlolo/kcard/issues/97"
+    },
+    {
+      "id": "T098",
+      "url": "https://github.com/dorlolo/kcard/issues/98"
+    },
+    {
+      "id": "T099",
+      "url": "https://github.com/dorlolo/kcard/issues/99"
+    },
+    {
+      "id": "T100",
+      "url": "https://github.com/dorlolo/kcard/issues/100"
+    },
+    {
+      "id": "T101",
+      "url": "https://github.com/dorlolo/kcard/issues/101"
+    },
+    {
+      "id": "T102",
+      "url": "https://github.com/dorlolo/kcard/issues/102"
+    },
+    {
+      "id": "T103",
+      "url": "https://github.com/dorlolo/kcard/issues/103"
+    },
+    {
+      "id": "T104",
+      "url": "https://github.com/dorlolo/kcard/issues/104"
+    },
+    {
+      "id": "T105",
+      "url": "https://github.com/dorlolo/kcard/issues/105"
+    },
+    {
+      "id": "T106",
+      "url": "https://github.com/dorlolo/kcard/issues/106"
+    },
+    {
+      "id": "T107",
+      "url": "https://github.com/dorlolo/kcard/issues/107"
+    },
+    {
+      "id": "T108",
+      "url": "https://github.com/dorlolo/kcard/issues/108"
+    },
+    {
+      "id": "T109",
+      "url": "https://github.com/dorlolo/kcard/issues/109"
+    },
+    {
+      "id": "T110",
+      "url": "https://github.com/dorlolo/kcard/issues/110"
+    },
+    {
+      "id": "T111",
+      "url": "https://github.com/dorlolo/kcard/issues/111"
+    },
+    {
+      "id": "T112",
+      "url": "https://github.com/dorlolo/kcard/issues/112"
+    },
+    {
+      "id": "T113",
+      "url": "https://github.com/dorlolo/kcard/issues/113"
+    },
+    {
+      "id": "T114",
+      "url": "https://github.com/dorlolo/kcard/issues/114"
+    },
+    {
+      "id": "T115",
+      "url": "https://github.com/dorlolo/kcard/issues/115"
+    },
+    {
+      "id": "T116",
+      "url": "https://github.com/dorlolo/kcard/issues/116"
+    },
+    {
+      "id": "T117",
+      "url": "https://github.com/dorlolo/kcard/issues/117"
+    },
+    {
+      "id": "T118",
+      "url": "https://github.com/dorlolo/kcard/issues/118"
+    },
+    {
+      "id": "T119",
+      "url": "https://github.com/dorlolo/kcard/issues/119"
+    },
+    {
+      "id": "T120",
+      "url": "https://github.com/dorlolo/kcard/issues/120"
+    },
+    {
+      "id": "T121",
+      "url": "https://github.com/dorlolo/kcard/issues/121"
+    },
+    {
+      "id": "T122",
+      "url": "https://github.com/dorlolo/kcard/issues/122"
+    },
+    {
+      "id": "T123",
+      "url": "https://github.com/dorlolo/kcard/issues/123"
+    },
+    {
+      "id": "T124",
+      "url": "https://github.com/dorlolo/kcard/issues/124"
+    },
+    {
+      "id": "T125",
+      "url": "https://github.com/dorlolo/kcard/issues/125"
+    },
+    {
+      "id": "T126",
+      "url": "https://github.com/dorlolo/kcard/issues/126"
+    },
+    {
+      "id": "T127",
+      "url": "https://github.com/dorlolo/kcard/issues/127"
+    },
+    {
+      "id": "T128",
+      "url": "https://github.com/dorlolo/kcard/issues/128"
+    },
+    {
+      "id": "T129",
+      "url": "https://github.com/dorlolo/kcard/issues/129"
+    },
+    {
+      "id": "T130",
+      "url": "https://github.com/dorlolo/kcard/issues/130"
+    },
+    {
+      "id": "T131",
+      "url": "https://github.com/dorlolo/kcard/issues/131"
+    },
+    {
+      "id": "T132",
+      "url": "https://github.com/dorlolo/kcard/issues/132"
+    },
+    {
+      "id": "T133",
+      "url": "https://github.com/dorlolo/kcard/issues/133"
+    },
+    {
+      "id": "T134",
+      "url": "https://github.com/dorlolo/kcard/issues/134"
+    },
+    {
+      "id": "T135",
+      "url": "https://github.com/dorlolo/kcard/issues/135"
+    },
+    {
+      "id": "T136",
+      "url": "https://github.com/dorlolo/kcard/issues/136"
+    },
+    {
+      "id": "T137",
+      "url": "https://github.com/dorlolo/kcard/issues/137"
+    },
+    {
+      "id": "T138",
+      "url": "https://github.com/dorlolo/kcard/issues/138"
+    },
+    {
+      "id": "T139",
+      "url": "https://github.com/dorlolo/kcard/issues/139"
+    },
+    {
+      "id": "T140",
+      "url": "https://github.com/dorlolo/kcard/issues/140"
+    },
+    {
+      "id": "T141",
+      "url": "https://github.com/dorlolo/kcard/issues/141"
+    },
+    {
+      "id": "T142",
+      "url": "https://github.com/dorlolo/kcard/issues/142"
+    },
+    {
+      "id": "T143",
+      "url": "https://github.com/dorlolo/kcard/issues/143"
+    },
+    {
+      "id": "T144",
+      "url": "https://github.com/dorlolo/kcard/issues/144"
+    },
+    {
+      "id": "T145",
+      "url": "https://github.com/dorlolo/kcard/issues/145"
+    },
+    {
+      "id": "T146",
+      "url": "https://github.com/dorlolo/kcard/issues/146"
+    },
+    {
+      "id": "T147",
+      "url": "https://github.com/dorlolo/kcard/issues/147"
+    },
+    {
+      "id": "T148",
+      "url": "https://github.com/dorlolo/kcard/issues/148"
+    },
+    {
+      "id": "T149",
+      "url": "https://github.com/dorlolo/kcard/issues/149"
+    },
+    {
+      "id": "T150",
+      "url": "https://github.com/dorlolo/kcard/issues/150"
+    },
+    {
+      "id": "T151",
+      "url": "https://github.com/dorlolo/kcard/issues/151"
+    },
+    {
+      "id": "T152",
+      "url": "https://github.com/dorlolo/kcard/issues/152"
+    },
+    {
+      "id": "T153",
+      "url": "https://github.com/dorlolo/kcard/issues/153"
+    },
+    {
+      "id": "T154",
+      "url": "https://github.com/dorlolo/kcard/issues/154"
+    },
+    {
+      "id": "T155",
+      "url": "https://github.com/dorlolo/kcard/issues/155"
+    },
+    {
+      "id": "T156",
+      "url": "https://github.com/dorlolo/kcard/issues/156"
+    },
+    {
+      "id": "T157",
+      "url": "https://github.com/dorlolo/kcard/issues/157"
+    }
+  ],
+  "failed_items": []
+}

@@ -1,0 +1,1665 @@
+openapi: 3.1.0
+info:
+  title: AI Card Review Web App API
+  version: 0.1.0
+  description: >
+    Contract for the separated frontend/backend AI card review application. The API exposes
+    learner workspace operations for material intake, knowledge curation, AI draft workflows,
+    deck/card management, review sessions, review plans, statistics, and exports/imports.
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local development
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Dashboard
+  - name: Materials
+  - name: Knowledge
+  - name: Prompts
+  - name: AI Jobs
+  - name: Decks
+  - name: Cards
+  - name: Review
+  - name: Plans
+  - name: Statistics
+  - name: Portability
+
+paths:
+  /dashboard:
+    get:
+      tags: [Dashboard]
+      summary: Get learner dashboard summary and next actions
+      operationId: getDashboard
+      responses:
+        '200':
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardSummary'
+
+  /materials:
+    get:
+      tags: [Materials]
+      summary: List source materials
+      operationId: listMaterials
+      parameters:
+        - $ref: '#/components/parameters/TagFilter'
+        - $ref: '#/components/parameters/StatusFilter'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Materials page
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaterialPage'
+    post:
+      tags: [Materials]
+      summary: Create source material from file, URL, or text
+      operationId: createMaterial
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMaterialRequest'
+      responses:
+        '202':
+          description: Material accepted and analysis job queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaterialJobAccepted'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /materials/{materialId}:
+    get:
+      tags: [Materials]
+      summary: Get material detail
+      operationId: getMaterial
+      parameters:
+        - $ref: '#/components/parameters/MaterialId'
+      responses:
+        '200':
+          description: Material detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Material'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Materials]
+      summary: Update material tags, title, or archive state
+      operationId: updateMaterial
+      parameters:
+        - $ref: '#/components/parameters/MaterialId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMaterialRequest'
+      responses:
+        '200':
+          description: Updated material
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Material'
+
+  /materials/{materialId}/reanalyze:
+    post:
+      tags: [Materials, AI Jobs]
+      summary: Queue material re-analysis
+      operationId: reanalyzeMaterial
+      parameters:
+        - $ref: '#/components/parameters/MaterialId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyzeMaterialRequest'
+      responses:
+        '202':
+          description: Re-analysis job queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobAccepted'
+
+  /knowledge-points:
+    get:
+      tags: [Knowledge]
+      summary: List knowledge points
+      operationId: listKnowledgePoints
+      parameters:
+        - $ref: '#/components/parameters/TagFilter'
+        - name: approvalStatus
+          in: query
+          schema:
+            $ref: '#/components/schemas/ApprovalStatus'
+        - name: q
+          in: query
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Knowledge point page
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgePointPage'
+
+  /knowledge-points/{knowledgePointId}:
+    patch:
+      tags: [Knowledge]
+      summary: Update knowledge point content, status, tags, or notes
+      operationId: updateKnowledgePoint
+      parameters:
+        - $ref: '#/components/parameters/KnowledgePointId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKnowledgePointRequest'
+      responses:
+        '200':
+          description: Updated knowledge point
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgePoint'
+
+  /knowledge-points/{knowledgePointId}/split:
+    post:
+      tags: [Knowledge]
+      summary: Split one knowledge point into multiple points
+      operationId: splitKnowledgePoint
+      parameters:
+        - $ref: '#/components/parameters/KnowledgePointId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SplitKnowledgePointRequest'
+      responses:
+        '201':
+          description: Created split knowledge points
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/KnowledgePoint'
+
+  /knowledge-points/merge:
+    post:
+      tags: [Knowledge]
+      summary: Merge multiple knowledge points
+      operationId: mergeKnowledgePoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MergeKnowledgePointsRequest'
+      responses:
+        '201':
+          description: Merged knowledge point
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgePoint'
+
+  /prompts:
+    get:
+      tags: [Prompts]
+      summary: List prompt presets
+      operationId: listPromptPresets
+      parameters:
+        - name: purpose
+          in: query
+          schema:
+            $ref: '#/components/schemas/PromptPurpose'
+      responses:
+        '200':
+          description: Prompt presets
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PromptPreset'
+    post:
+      tags: [Prompts]
+      summary: Create prompt preset
+      operationId: createPromptPreset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavePromptPresetRequest'
+      responses:
+        '201':
+          description: Created prompt preset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromptPreset'
+
+  /ai/jobs/{jobId}:
+    get:
+      tags: [AI Jobs]
+      summary: Get AI/import/export job status and progress
+      operationId: getJob
+      parameters:
+        - $ref: '#/components/parameters/JobId'
+      responses:
+        '200':
+          description: Job detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIJob'
+
+  /ai/drafts/{draftId}:
+    patch:
+      tags: [AI Jobs]
+      summary: Approve, edit, discard, or supersede an AI draft
+      operationId: updateAIDraft
+      parameters:
+        - $ref: '#/components/parameters/DraftId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAIDraftRequest'
+      responses:
+        '200':
+          description: Updated draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIDraft'
+
+  /decks/generate:
+    post:
+      tags: [Decks, AI Jobs]
+      summary: Generate deck and card drafts from approved knowledge points
+      operationId: generateDecks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateDecksRequest'
+      responses:
+        '202':
+          description: Generation job queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobAccepted'
+
+  /decks:
+    get:
+      tags: [Decks]
+      summary: List decks
+      operationId: listDecks
+      parameters:
+        - $ref: '#/components/parameters/TagFilter'
+        - $ref: '#/components/parameters/StatusFilter'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Deck page
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeckPage'
+    post:
+      tags: [Decks]
+      summary: Create a deck manually
+      operationId: createDeck
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDeckRequest'
+      responses:
+        '201':
+          description: Created deck
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deck'
+
+  /decks/{deckId}:
+    get:
+      tags: [Decks]
+      summary: Get deck detail
+      operationId: getDeck
+      parameters:
+        - $ref: '#/components/parameters/DeckId'
+      responses:
+        '200':
+          description: Deck detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deck'
+    patch:
+      tags: [Decks]
+      summary: Update deck metadata or archive state
+      operationId: updateDeck
+      parameters:
+        - $ref: '#/components/parameters/DeckId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDeckRequest'
+      responses:
+        '200':
+          description: Updated deck
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deck'
+
+  /decks/merge:
+    post:
+      tags: [Decks]
+      summary: Merge decks into a combined deck
+      operationId: mergeDecks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MergeDecksRequest'
+      responses:
+        '201':
+          description: Merged deck
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deck'
+
+  /decks/{deckId}/restore:
+    post:
+      tags: [Decks]
+      summary: Restore a merged deck to its source deck grouping
+      operationId: restoreDeckComposition
+      parameters:
+        - $ref: '#/components/parameters/DeckId'
+      responses:
+        '201':
+          description: Restored decks
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, warnings]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Deck'
+                  warnings:
+                    type: array
+                    items:
+                      type: string
+
+  /cards:
+    get:
+      tags: [Cards]
+      summary: List cards
+      operationId: listCards
+      parameters:
+        - $ref: '#/components/parameters/TagFilter'
+        - name: deckId
+          in: query
+          schema:
+            type: string
+        - name: dueState
+          in: query
+          schema:
+            type: string
+            enum: [new, learning, due, not_due, suspended]
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Card page
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardPage'
+    post:
+      tags: [Cards]
+      summary: Create a card manually
+      operationId: createCard
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCardRequest'
+      responses:
+        '201':
+          description: Created card
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Card'
+
+  /cards/{cardId}:
+    patch:
+      tags: [Cards]
+      summary: Update card content, deck membership, tags, difficulty, or status
+      operationId: updateCard
+      parameters:
+        - $ref: '#/components/parameters/CardId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCardRequest'
+      responses:
+        '200':
+          description: Updated card
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Card'
+
+  /review/sessions:
+    post:
+      tags: [Review]
+      summary: Start a direct or plan-based review session
+      operationId: startReviewSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartReviewSessionRequest'
+      responses:
+        '201':
+          description: Started review session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewSession'
+
+  /review/sessions/{sessionId}/answers:
+    post:
+      tags: [Review]
+      summary: Record one card answer in a review session
+      operationId: recordReviewAnswer
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordReviewAnswerRequest'
+      responses:
+        '201':
+          description: Recorded answer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewResult'
+
+  /review/sessions/{sessionId}:
+    patch:
+      tags: [Review]
+      summary: Pause, resume, complete, or abandon a review session
+      operationId: updateReviewSession
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReviewSessionRequest'
+      responses:
+        '200':
+          description: Updated review session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewSession'
+
+  /plans:
+    get:
+      tags: [Plans]
+      summary: List review plans
+      operationId: listPlans
+      parameters:
+        - $ref: '#/components/parameters/StatusFilter'
+      responses:
+        '200':
+          description: Review plans
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReviewPlan'
+    post:
+      tags: [Plans]
+      summary: Create a manual review plan
+      operationId: createPlan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePlanRequest'
+      responses:
+        '201':
+          description: Created review plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewPlan'
+
+  /plans/generate:
+    post:
+      tags: [Plans, AI Jobs]
+      summary: Generate an AI-assisted review plan draft
+      operationId: generatePlan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeneratePlanRequest'
+      responses:
+        '202':
+          description: Plan generation job queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobAccepted'
+
+  /plans/{planId}:
+    patch:
+      tags: [Plans]
+      summary: Update plan metadata, schedule, or status
+      operationId: updatePlan
+      parameters:
+        - $ref: '#/components/parameters/PlanId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePlanRequest'
+      responses:
+        '200':
+          description: Updated review plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewPlan'
+
+  /plans/{planId}/optimize:
+    post:
+      tags: [Plans, AI Jobs]
+      summary: Queue AI-assisted or rules-based plan optimization
+      operationId: optimizePlan
+      parameters:
+        - $ref: '#/components/parameters/PlanId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OptimizePlanRequest'
+      responses:
+        '202':
+          description: Plan optimization job queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobAccepted'
+
+  /plans/{planId}/revisions:
+    get:
+      tags: [Plans]
+      summary: List plan revisions
+      operationId: listPlanRevisions
+      parameters:
+        - $ref: '#/components/parameters/PlanId'
+      responses:
+        '200':
+          description: Plan revisions
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PlanRevision'
+
+  /plans/{planId}/revisions/{revisionId}/restore:
+    post:
+      tags: [Plans]
+      summary: Restore a compatible prior plan revision
+      operationId: restorePlanRevision
+      parameters:
+        - $ref: '#/components/parameters/PlanId'
+        - name: revisionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Restored review plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewPlan'
+
+  /statistics:
+    get:
+      tags: [Statistics]
+      summary: Get review statistics by scope and period
+      operationId: getStatistics
+      parameters:
+        - name: scopeType
+          in: query
+          schema:
+            type: string
+            enum: [workspace, tag, deck, plan, card]
+        - name: scopeId
+          in: query
+          schema:
+            type: string
+        - name: periodStart
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: periodEnd
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Statistics snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewStatistics'
+
+  /exports:
+    post:
+      tags: [Portability]
+      summary: Queue workspace export
+      operationId: createExport
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExportRequest'
+      responses:
+        '202':
+          description: Export job queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobAccepted'
+
+  /imports:
+    post:
+      tags: [Portability]
+      summary: Preview or confirm workspace import
+      operationId: importWorkspace
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportWorkspaceRequest'
+      responses:
+        '202':
+          description: Import job queued or preview started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobAccepted'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque-session-token
+
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    PageSize:
+      name: pageSize
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+    TagFilter:
+      name: tag
+      in: query
+      schema:
+        type: array
+        items:
+          type: string
+      style: form
+      explode: true
+    StatusFilter:
+      name: status
+      in: query
+      schema:
+        type: string
+    MaterialId:
+      name: materialId
+      in: path
+      required: true
+      schema:
+        type: string
+    KnowledgePointId:
+      name: knowledgePointId
+      in: path
+      required: true
+      schema:
+        type: string
+    DeckId:
+      name: deckId
+      in: path
+      required: true
+      schema:
+        type: string
+    CardId:
+      name: cardId
+      in: path
+      required: true
+      schema:
+        type: string
+    PlanId:
+      name: planId
+      in: path
+      required: true
+      schema:
+        type: string
+    JobId:
+      name: jobId
+      in: path
+      required: true
+      schema:
+        type: string
+    DraftId:
+      name: draftId
+      in: path
+      required: true
+      schema:
+        type: string
+    SessionId:
+      name: sessionId
+      in: path
+      required: true
+      schema:
+        type: string
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: array
+              items:
+                type: string
+
+    PageMeta:
+      type: object
+      required: [page, pageSize, total]
+      properties:
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+
+    ApprovalStatus:
+      type: string
+      enum: [draft, approved, rejected, needs_review]
+
+    PromptPurpose:
+      type: string
+      enum: [classification, card_generation, plan_creation, plan_optimization, cleanup]
+
+    CreateMaterialRequest:
+      type: object
+      required: [sourceType, tags]
+      properties:
+        sourceType:
+          type: string
+          enum: [file, web_page, text]
+        title:
+          type: string
+        url:
+          type: string
+          format: uri
+        text:
+          type: string
+        fileToken:
+          type: string
+          description: Previously uploaded file token if sourceType is file
+        tags:
+          type: array
+          items:
+            type: string
+        promptPresetId:
+          type: string
+        promptText:
+          type: string
+        duplicatePolicy:
+          type: string
+          enum: [warn, associate, continue]
+          default: warn
+
+    AnalyzeMaterialRequest:
+      type: object
+      properties:
+        promptPresetId:
+          type: string
+        promptText:
+          type: string
+        includeUnchangedContent:
+          type: boolean
+          default: false
+
+    MaterialJobAccepted:
+      type: object
+      required: [material, job]
+      properties:
+        material:
+          $ref: '#/components/schemas/Material'
+        job:
+          $ref: '#/components/schemas/AIJob'
+
+    JobAccepted:
+      type: object
+      required: [job]
+      properties:
+        job:
+          $ref: '#/components/schemas/AIJob'
+
+    MaterialPage:
+      type: object
+      required: [items, meta]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Material'
+        meta:
+          $ref: '#/components/schemas/PageMeta'
+
+    Material:
+      type: object
+      required: [id, sourceType, title, processingStatus, tags]
+      properties:
+        id:
+          type: string
+        sourceType:
+          type: string
+          enum: [file, web_page, text]
+        title:
+          type: string
+        sourceLabel:
+          type: string
+        processingStatus:
+          type: string
+          enum: [draft, queued, processing, needs_review, processed, failed]
+        failureReason:
+          type: string
+        duplicateStatus:
+          type: string
+          enum: [unchecked, possible_duplicate, confirmed_duplicate, unique]
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UpdateMaterialRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        archived:
+          type: boolean
+
+    Tag:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        color:
+          type: string
+
+    KnowledgePointPage:
+      type: object
+      required: [items, meta]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/KnowledgePoint'
+        meta:
+          $ref: '#/components/schemas/PageMeta'
+
+    KnowledgePoint:
+      type: object
+      required: [id, content, approvalStatus, tags]
+      properties:
+        id:
+          type: string
+        sourceMaterialId:
+          type: string
+        content:
+          type: string
+        summary:
+          type: string
+        notes:
+          type: string
+        approvalStatus:
+          $ref: '#/components/schemas/ApprovalStatus'
+        creationSource:
+          type: string
+          enum: [ai_generated, manual, imported]
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        duplicateGroupId:
+          type: string
+
+    UpdateKnowledgePointRequest:
+      type: object
+      properties:
+        content:
+          type: string
+        summary:
+          type: string
+        notes:
+          type: string
+        approvalStatus:
+          $ref: '#/components/schemas/ApprovalStatus'
+        tags:
+          type: array
+          items:
+            type: string
+
+    SplitKnowledgePointRequest:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            required: [content]
+            properties:
+              content:
+                type: string
+              summary:
+                type: string
+              tags:
+                type: array
+                items:
+                  type: string
+
+    MergeKnowledgePointsRequest:
+      type: object
+      required: [knowledgePointIds, content]
+      properties:
+        knowledgePointIds:
+          type: array
+          minItems: 2
+          items:
+            type: string
+        content:
+          type: string
+        summary:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+
+    PromptPreset:
+      type: object
+      required: [id, name, purpose, promptText]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        purpose:
+          $ref: '#/components/schemas/PromptPurpose'
+        promptText:
+          type: string
+        isDefault:
+          type: boolean
+
+    SavePromptPresetRequest:
+      type: object
+      required: [name, purpose, promptText]
+      properties:
+        name:
+          type: string
+        purpose:
+          $ref: '#/components/schemas/PromptPurpose'
+        promptText:
+          type: string
+        isDefault:
+          type: boolean
+          default: false
+
+    AIJob:
+      type: object
+      required: [id, jobType, status, progressPercent, currentStep]
+      properties:
+        id:
+          type: string
+        jobType:
+          type: string
+          enum: [material_analysis, card_generation, plan_generation, plan_optimization, import, export]
+        status:
+          type: string
+          enum: [queued, running, partial_success, succeeded, failed, cancelled]
+        progressPercent:
+          type: integer
+          minimum: 0
+          maximum: 100
+        currentStep:
+          type: string
+        errorMessage:
+          type: string
+        resultDraftIds:
+          type: array
+          items:
+            type: string
+
+    AIDraft:
+      type: object
+      required: [id, draftType, status, validationStatus, payload]
+      properties:
+        id:
+          type: string
+        draftType:
+          type: string
+          enum: [knowledge_point, card, deck, review_plan]
+        status:
+          type: string
+          enum: [draft, approved, discarded, superseded]
+        validationStatus:
+          type: string
+          enum: [valid, warning, invalid]
+        validationMessages:
+          type: array
+          items:
+            type: string
+        payload:
+          type: object
+          additionalProperties: true
+
+    UpdateAIDraftRequest:
+      type: object
+      required: [action]
+      properties:
+        action:
+          type: string
+          enum: [approve, edit, discard, supersede]
+        payload:
+          type: object
+          additionalProperties: true
+
+    GenerateDecksRequest:
+      type: object
+      required: [promptText]
+      properties:
+        promptPresetId:
+          type: string
+        promptText:
+          type: string
+        tagIds:
+          type: array
+          items:
+            type: string
+        sourceMaterialIds:
+          type: array
+          items:
+            type: string
+        includeUnapproved:
+          type: boolean
+          default: false
+
+    DeckPage:
+      type: object
+      required: [items, meta]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Deck'
+        meta:
+          $ref: '#/components/schemas/PageMeta'
+
+    Deck:
+      type: object
+      required: [id, name, status, cardCount]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [draft, active, archived, deleted]
+        creationSource:
+          type: string
+          enum: [manual, ai_generated, merged, imported]
+        cardCount:
+          type: integer
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+
+    CreateDeckRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        tagIds:
+          type: array
+          items:
+            type: string
+
+    UpdateDeckRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [active, archived, deleted]
+        tagIds:
+          type: array
+          items:
+            type: string
+
+    MergeDecksRequest:
+      type: object
+      required: [deckIds, name]
+      properties:
+        deckIds:
+          type: array
+          minItems: 2
+          items:
+            type: string
+        name:
+          type: string
+        archiveSourceDecks:
+          type: boolean
+          default: true
+
+    CardPage:
+      type: object
+      required: [items, meta]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Card'
+        meta:
+          $ref: '#/components/schemas/PageMeta'
+
+    Card:
+      type: object
+      required: [id, frontPrompt, backAnswer, status, reviewStatus]
+      properties:
+        id:
+          type: string
+        frontPrompt:
+          type: string
+        backAnswer:
+          type: string
+        explanation:
+          type: string
+        learnerNotes:
+          type: string
+        status:
+          type: string
+          enum: [draft, active, archived, deleted]
+        reviewStatus:
+          type: string
+          enum: [new, learning, due, not_due, suspended]
+        difficulty:
+          type: string
+          enum: [unrated, easy, medium, hard]
+        deckIds:
+          type: array
+          items:
+            type: string
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+
+    CreateCardRequest:
+      type: object
+      required: [frontPrompt, backAnswer]
+      properties:
+        frontPrompt:
+          type: string
+        backAnswer:
+          type: string
+        explanation:
+          type: string
+        learnerNotes:
+          type: string
+        deckIds:
+          type: array
+          items:
+            type: string
+        tagIds:
+          type: array
+          items:
+            type: string
+
+    UpdateCardRequest:
+      type: object
+      properties:
+        frontPrompt:
+          type: string
+        backAnswer:
+          type: string
+        explanation:
+          type: string
+        learnerNotes:
+          type: string
+        status:
+          type: string
+          enum: [draft, active, archived, deleted]
+        difficulty:
+          type: string
+          enum: [unrated, easy, medium, hard]
+        deckIds:
+          type: array
+          items:
+            type: string
+        tagIds:
+          type: array
+          items:
+            type: string
+
+    StartReviewSessionRequest:
+      type: object
+      required: [sessionType]
+      properties:
+        sessionType:
+          type: string
+          enum: [direct, plan_based]
+        deckId:
+          type: string
+        planId:
+          type: string
+        dueOnly:
+          type: boolean
+          default: false
+        maxCards:
+          type: integer
+
+    ReviewSession:
+      type: object
+      required: [id, sessionType, status, cardsRemaining]
+      properties:
+        id:
+          type: string
+        sessionType:
+          type: string
+          enum: [direct, plan_based]
+        status:
+          type: string
+          enum: [active, paused, completed, abandoned]
+        cardsRemaining:
+          type: integer
+        summary:
+          type: string
+
+    RecordReviewAnswerRequest:
+      type: object
+      required: [cardId, result, elapsedResponseMs]
+      properties:
+        cardId:
+          type: string
+        result:
+          type: string
+          enum: [again, hard, good, easy, correct, incorrect]
+        confidence:
+          type: integer
+          minimum: 1
+          maximum: 5
+        elapsedResponseMs:
+          type: integer
+
+    ReviewResult:
+      type: object
+      required: [id, cardId, result, nextDueAt]
+      properties:
+        id:
+          type: string
+        cardId:
+          type: string
+        result:
+          type: string
+        nextDueAt:
+          type: string
+          format: date-time
+        scheduleReason:
+          type: string
+
+    UpdateReviewSessionRequest:
+      type: object
+      required: [action]
+      properties:
+        action:
+          type: string
+          enum: [pause, resume, complete, abandon]
+
+    CreatePlanRequest:
+      type: object
+      required: [name, deckIds, startDate, targetCompletionDate, dailyCapacity]
+      properties:
+        name:
+          type: string
+        goal:
+          type: string
+        deckIds:
+          type: array
+          items:
+            type: string
+        startDate:
+          type: string
+          format: date
+        targetCompletionDate:
+          type: string
+          format: date
+        dailyCapacity:
+          type: integer
+        overlapPolicy:
+          type: string
+          enum: [prevent, allow_with_warning]
+          default: prevent
+
+    GeneratePlanRequest:
+      allOf:
+        - $ref: '#/components/schemas/CreatePlanRequest'
+        - type: object
+          required: [promptText]
+          properties:
+            promptPresetId:
+              type: string
+            promptText:
+              type: string
+
+    UpdatePlanRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        goal:
+          type: string
+        status:
+          type: string
+          enum: [active, paused, completed, archived]
+        dailyCapacity:
+          type: integer
+        targetCompletionDate:
+          type: string
+          format: date
+
+    OptimizePlanRequest:
+      type: object
+      required: [mode]
+      properties:
+        mode:
+          type: string
+          enum: [ai_assisted, rules_based]
+        promptPresetId:
+          type: string
+        promptText:
+          type: string
+        respectDailyCapacity:
+          type: boolean
+          default: true
+
+    ReviewPlan:
+      type: object
+      required: [id, name, status, dailyCapacity]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        goal:
+          type: string
+        status:
+          type: string
+          enum: [draft, active, paused, completed, archived]
+        startDate:
+          type: string
+          format: date
+        targetCompletionDate:
+          type: string
+          format: date
+        dailyCapacity:
+          type: integer
+        deckIds:
+          type: array
+          items:
+            type: string
+        currentRevisionId:
+          type: string
+
+    PlanRevision:
+      type: object
+      required: [id, revisionNumber, changeSource, changeSummary, createdAt]
+      properties:
+        id:
+          type: string
+        revisionNumber:
+          type: integer
+        changeSource:
+          type: string
+          enum: [manual, ai_assisted, rules_based]
+        changeSummary:
+          type: string
+        changeReason:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    ReviewStatistics:
+      type: object
+      required: [scopeType, cardsReviewed, recallRate, overdueCount, weakAreas]
+      properties:
+        scopeType:
+          type: string
+        scopeId:
+          type: string
+        cardsReviewed:
+          type: integer
+        recallRate:
+          type: number
+        overdueCount:
+          type: integer
+        completionRate:
+          type: number
+        weakAreas:
+          type: array
+          items:
+            type: object
+            required: [label, score]
+            properties:
+              label:
+                type: string
+              score:
+                type: number
+
+    DashboardSummary:
+      type: object
+      required: [draftsNeedingApproval, dueReviews, overdueReviews, activePlans, weakAreas, nextActions]
+      properties:
+        draftsNeedingApproval:
+          type: integer
+        dueReviews:
+          type: integer
+        overdueReviews:
+          type: integer
+        activePlans:
+          type: integer
+        weakAreas:
+          type: array
+          items:
+            type: string
+        nextActions:
+          type: array
+          items:
+            type: object
+            required: [type, label]
+            properties:
+              type:
+                type: string
+              label:
+                type: string
+              targetId:
+                type: string
+
+    CreateExportRequest:
+      type: object
+      required: [includedContent]
+      properties:
+        includedContent:
+          type: array
+          items:
+            type: string
+            enum: [materials, knowledge_points, prompts, decks, cards, review_plans, review_history, statistics]
+
+    ImportWorkspaceRequest:
+      type: object
+      required: [fileToken, mode]
+      properties:
+        fileToken:
+          type: string
+        mode:
+          type: string
+          enum: [preview, confirm]
+        conflictPolicy:
+          type: string
+          enum: [skip, rename, replace]
+          default: rename

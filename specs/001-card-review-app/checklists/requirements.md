@@ -31,5 +31,7 @@
 
 ## Notes
 
-- Validation passed on first iteration.
-- The specification uses assumptions for initial scope: individual learner workspace, AI outputs as reviewable drafts, and no collaboration/sharing in the first release.
+- Validation passed after the palette enhancement iteration on 2026-06-09.
+- The enhanced specification keeps the initial scope as an individual learner workspace and explicitly excludes collaboration, public sharing, marketplace features, and classroom administration from the first release.
+- Additions include knowledge curation, prompt presets, AI draft transparency, duplicate handling, session interruption recovery, dashboard next actions, privacy defaults, export/import, accessibility, and more complete statistics and plan revision behavior.
+- Palette requirements are now explicit: #fff8e7 is the primary learner-facing background/base tone, while #f8e7ff and #e7fff8 are supporting soft accent backgrounds. The spec also requires readable text, controls, focus indicators, errors, and chart labels on these backgrounds.
