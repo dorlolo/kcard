@@ -15,8 +15,9 @@ Gin for HTTP routing, CloudWeGo Eino for AI workflow orchestration, GORM for per
 PostgreSQL for durable data, Redis for queues/cache/session-like ephemeral state, and the
 Anthropic Go SDK for Claude-powered classification, card generation, and plan optimization.
 The frontend will be a Vue 3 single-page app with a consistent learner dashboard, material
-review, card/deck management, and review-plan experience using #fff8e7 as the primary soft
-study background/base tone and #f8e7ff plus #e7fff8 as supporting accent backgrounds.
+review, knowledge list and Obsidian-like graph exploration, card/deck management, and review-plan
+experience using #fff8e7 as the primary soft study background/base tone and #f8e7ff plus #e7fff8
+as supporting accent backgrounds.
 
 ## Technical Context
 
@@ -25,12 +26,14 @@ study background/base tone and #f8e7ff plus #e7fff8 as supporting accent backgro
 **Primary Dependencies**: Backend: Gin, CloudWeGo Eino, GORM, PostgreSQL driver, Redis client,
 Anthropic Go SDK, structured logging, validation, OpenAPI generation/validation. Frontend:
 Vue 3, Vite, Vue Router, Pinia, TanStack Query or equivalent server-state layer, UI component
-library chosen during implementation, charting library for statistics.
+library chosen during implementation, charting library for statistics, and a graph visualization
+library such as Vue Flow or Cytoscape.js for the knowledge relationship graph.
 
-**Storage**: PostgreSQL for learner workspaces, materials, knowledge points, prompt presets,
-decks, cards, review sessions, review plans, plan revisions, and statistics snapshots; Redis
-for AI job queues, idempotency locks, short-lived progress events, cache entries, and rate-limit
-coordination; object/local storage abstraction for uploaded source files and exports.
+**Storage**: PostgreSQL for learner workspaces, materials, knowledge points, knowledge
+relationships/graph edges, prompt presets, decks, cards, review sessions, review plans, plan
+revisions, and statistics snapshots; Redis for AI job queues, idempotency locks, short-lived
+progress events, cache entries, and rate-limit coordination; object/local storage abstraction for
+uploaded source files and exports.
 
 **Testing**: Backend unit tests with `go test`, handler tests with `httptest`, repository and
 contract tests with disposable PostgreSQL/Redis containers, AI workflow tests with mocked model
@@ -44,8 +47,10 @@ a Linux containerized web service with worker capability for long-running AI job
 
 **Performance Goals**: Show feedback within 2 seconds for long-running AI/import/export/plan
 operations; deck/card filtering and view switching visible within 1 second for 500 decks and
-5,000 cards; typical material under 5,000 words produces reviewable AI output or clear failure
-within 2 minutes; review session answer recording completes within 500 ms from learner action.
+5,000 cards; knowledge list/graph switching and graph filtering visible within 1 second for 1,000
+knowledge points by initially rendering a filtered or clustered graph; typical material under
+5,000 words produces reviewable AI output or clear failure within 2 minutes; review session
+answer recording completes within 500 ms from learner action.
 
 **Constraints**: AI outputs are drafts until approved; no collaboration/sharing in first
 release; learner workspace content private by default; destructive actions require confirmation
@@ -56,8 +61,8 @@ backgrounds while preserving readable text, controls, focus indicators, charts, 
 feedback.
 
 **Scale/Scope**: First release supports one private learner workspace per account; target per
-workspace up to 200 materials, 1,000 knowledge points, 500 decks, 5,000 cards, 100 prompt
-presets, and 20 active or paused review plans.
+workspace up to 200 materials, 1,000 knowledge points, 10,000 knowledge relationship edges, 500
+decks, 5,000 cards, 100 prompt presets, and 20 active or paused review plans.
 
 ## Constitution Check
 

@@ -181,6 +181,8 @@ plans, and statistics.
 - `approval_status` (`draft`, `approved`, `rejected`, `needs_review`)
 - `creation_source` (`ai_generated`, `manual`, `imported`)
 - `duplicate_group_id`
+- `graph_label`
+- `graph_position_hint`
 - `ai_job_id`
 - `prompt_snapshot_id`
 - `approved_at`
@@ -192,12 +194,15 @@ plans, and statistics.
 - Optionally belongs to source material and material version.
 - Has many tags.
 - Has many cards through card source links.
+- Has many knowledge relationships as source or target graph nodes.
 - May belong to a duplicate group.
 
 **Validation Rules**:
 - Approved knowledge point must have non-empty content.
 - Rejected knowledge point is excluded from default card generation.
 - Split knowledge points inherit source references and selected tags.
+- Graph labels should be short, learner-readable summaries and must not replace full content.
+- Archived or rejected points remain available to graph queries only when explicitly included.
 
 **State Transitions**:
 - `draft` → `approved`
@@ -205,6 +210,41 @@ plans, and statistics.
 - `draft` → `needs_review`
 - `needs_review` → `approved` or `rejected`
 - `approved` → `needs_review` when source changes or learner marks it uncertain
+
+## Entity: Knowledge Relationship
+
+**Purpose**: Typed graph edge used by the Obsidian-like knowledge graph to explain how recorded
+knowledge points relate to each other and to source/card/tag context.
+
+**Fields**:
+- `id`
+- `learner_workspace_id`
+- `source_knowledge_point_id`
+- `target_knowledge_point_id`
+- `relationship_type` (`related`, `prerequisite`, `duplicate`, `similar`, `split_from`,
+  `merged_from`, `supports`, `contradicts`, `shared_source`, `shared_tag`, `generated_card`)
+- `label`
+- `weight`
+- `source_type` (`ai_suggested`, `learner_created`, `system_derived`, `imported`)
+- `source_material_id`
+- `tag_id`
+- `card_id`
+- `confidence`
+- `archived_at`
+
+**Relationships**:
+- Belongs to learner workspace.
+- Connects two knowledge points for direct concept relationships.
+- Optionally references source material, tag, or card context for derived graph edges.
+
+**Validation Rules**:
+- Relationship source and target must belong to the same workspace.
+- Direct knowledge-to-knowledge relationships require both source and target knowledge point IDs.
+- Derived shared-source/shared-tag/generated-card relationships must include the relevant context
+  ID and may be materialized or computed for graph responses.
+- Duplicate, split, and merge relationships must preserve lineage even when points are archived.
+- Relationship graph APIs must support filters by tag, source, approval status, relationship
+  type, creation source, and local-neighborhood depth.
 
 ## Entity: Prompt Preset
 
@@ -582,6 +622,8 @@ creation, plan optimization, or cleanup.
 
 ## Cross-Entity Rules
 
+- Knowledge graph relationships must not create cross-workspace edges and must keep archived or
+  rejected content hidden from default graph responses unless explicitly requested.
 - AI-generated trusted items must retain `creation_source`, `prompt_snapshot_id`, and model ID
   through prompt snapshot.
 - Tags can be archived but historical references remain intact.

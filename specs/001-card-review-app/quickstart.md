@@ -81,6 +81,8 @@ Do not hardcode secrets in repository files.
 6. Review extracted knowledge points.
 7. Edit one knowledge point, reject one, and approve the rest.
 8. Split one overloaded knowledge point and merge two duplicates.
+9. Switch from list view to the Obsidian-like graph view, filter by one tag, inspect relationship
+   labels, select a related node, and open that knowledge point for editing.
 
 **Expected outcome**:
 
@@ -88,6 +90,9 @@ Do not hardcode secrets in repository files.
 - Approved knowledge points are searchable in the knowledge library.
 - Rejected or needs-review points are excluded from default card generation.
 - Duplicate/split/merge operations preserve source references and tags.
+- Knowledge list view supports search/filter/review actions, and graph view shows searchable
+  nodes with relationship labels for sources, tags, duplicates, related concepts, and generated
+  cards where available.
 - Loading, partial success, empty, and failure states are visible where applicable.
 
 ## Scenario 2: Generate and Approve Cards
@@ -236,6 +241,9 @@ For each AI workflow, validate both a real-provider path and a deterministic moc
 Validate against the success criteria and constitution budgets:
 
 - Long-running operations show visible feedback within 2 seconds.
+- Knowledge list/graph switching, graph filtering, and opening a focused node respond within 1
+  second at the 1,000-knowledge-point / 10,000-edge target scale by using filtering, clustering,
+  or local-neighborhood rendering where needed.
 - Typical material under 5,000 words returns reviewable result or clear failure within 2 minutes.
 - Deck/card view switching and filtering responds within 1 second at target workspace scale.
 - Review answer recording completes within 500 ms from learner action.

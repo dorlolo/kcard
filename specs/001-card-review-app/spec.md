@@ -42,14 +42,16 @@ library without using card generation or review planning.
 
 ### User Story 2 - Curate knowledge before card generation (Priority: P2)
 
-As a learner, I want a knowledge point library where I can search, filter, merge, split, and
-mark knowledge points so that AI-generated content stays accurate before it becomes cards.
+As a learner, I want a knowledge point library where I can search, filter, browse in a list,
+explore an Obsidian-like relationship graph, merge, split, and mark knowledge points so that
+AI-generated content stays accurate before it becomes cards.
 
 **Why this priority**: Knowledge points are the bridge between raw materials and cards; poor
 curation produces poor review quality.
 
-**Independent Test**: Starting from extracted knowledge points, a learner can find duplicate or
-related points, merge two points, split one overloaded point, mark one as needing review, and
+**Independent Test**: Starting from extracted knowledge points, a learner can use list view to
+find duplicate or related points, switch to a graph view to inspect source/tag/card/semantic
+relationships, merge two points, split one overloaded point, mark one as needing review, and
 then use only approved points for card generation.
 
 **Acceptance Scenarios**:
@@ -62,6 +64,10 @@ then use only approved points for card generation.
 3. **Given** a knowledge point is marked as needing review, **When** the learner generates
    cards, **Then** that point is excluded unless the learner explicitly includes unapproved
    content.
+4. **Given** approved and draft knowledge points have shared tags, source materials, cards, or
+   related concepts, **When** the learner switches from list view to graph view, **Then** the app
+   shows an Obsidian-like relationship graph with searchable nodes, labeled relationship types,
+   filters, and a way to open or edit the selected knowledge point.
 
 ---
 
@@ -224,6 +230,8 @@ weak tags, and the next recommended action.
 - A learner bulk-approves AI output accidentally and needs to undo or return items to draft
   status.
 - A generated card links to a knowledge point that is later merged, split, rejected, or deleted.
+- The knowledge graph contains isolated nodes, dense duplicate clusters, cyclic relationships,
+  archived or rejected points, or more visible relationships than can be read comfortably.
 - A merged deck contains cards that were edited, moved, archived, or deleted after merging
   before the learner attempts to restore original decks.
 - A review plan conflicts with another active plan using the same cards or creates more daily
@@ -259,6 +267,13 @@ weak tags, and the next recommended action.
   approved library items.
 - **FR-007**: The system MUST allow learners to edit, approve, reject, restore, search, filter,
   merge, and split knowledge points.
+- **FR-007a**: The system MUST provide a knowledge list view and an Obsidian-like relationship
+  graph view for recorded knowledge points, including searchable nodes, relationship labels,
+  filters by tag/source/status/relationship type, and direct navigation to view or edit a
+  selected knowledge point.
+- **FR-007b**: The system MUST preserve and expose relationships between knowledge points,
+  including source-material links, shared tags, duplicate/similar relationships, split/merge
+  lineage, prerequisite or related-concept links, and generated card links where available.
 - **FR-008**: The system MUST identify likely duplicate materials, knowledge points, and cards
   and allow the learner to resolve duplicates without losing source references.
 - **FR-009**: The system MUST allow learners to generate decks and cards from approved
@@ -363,8 +378,11 @@ weak tags, and the next recommended action.
 - **Tag**: A learner-defined label used to group materials, knowledge points, decks, cards,
   review plans, and statistics.
 - **Knowledge Point**: A discrete concept extracted from source material; includes source
-  reference, tags, content, approval status, notes, duplicate relationship, and links to
-  generated cards.
+  reference, tags, content, approval status, notes, duplicate relationship, graph-display
+  metadata, and links to generated cards.
+- **Knowledge Relationship**: A typed edge between knowledge points or between knowledge points
+  and source/card/tag context; supports graph view relationships such as related concept,
+  prerequisite, duplicate, split-from, merged-from, shared source, shared tag, and generated card.
 - **Prompt Preset**: A default or learner-edited instruction used for classification, card
   generation, plan creation, plan optimization, or result cleanup.
 - **AI Draft**: A proposed knowledge point, card, deck, or review plan that remains untrusted
@@ -402,6 +420,9 @@ weak tags, and the next recommended action.
   minor edits or no edits during validation sessions.
 - **SC-004**: Learners can find and resolve a duplicate knowledge point or card within 2 minutes
   after the app flags the possible duplicate.
+- **SC-004a**: Learners can switch between knowledge list view and relationship graph view,
+  locate a related or prerequisite knowledge point, and open it for review within 30 seconds for
+  libraries containing up to 1,000 knowledge points.
 - **SC-005**: Learners can switch between deck view and card view, apply a tag filter, and open
   an item with visible feedback within 1 second for workspaces containing up to 500 decks and
   5,000 cards.

@@ -151,6 +151,25 @@ feature boundaries, testability, and responsive UI states.
 - Multiple separate apps: unnecessary for a single learner product and would harm UX
   consistency.
 
+## Decision: Obsidian-like knowledge relationship graph
+
+**Rationale**: Recorded knowledge needs both a dense list view for fast review and a graph view
+for understanding relationships among concepts, sources, tags, duplicate clusters, split/merge
+lineage, prerequisites, and generated cards. Store typed relationship edges in PostgreSQL and
+serve a filtered graph payload to the Vue frontend. The graph should default to a readable scope
+(current search/filter, selected source/tag, or local neighborhood) rather than rendering every
+edge at once, with clustering or edge-type filters for dense workspaces. Vue Flow or Cytoscape.js
+are suitable implementation choices; select during implementation based on component ergonomics,
+layout controls, and accessibility support.
+
+**Alternatives considered**:
+- Deriving relationships only in the browser from list data: simpler initially, but misses
+  persisted learner-created relationships, split/merge lineage, and scalable filtering.
+- Full graph database: powerful for deep graph traversal, but unnecessary for the first-release
+  1,000-node / 10,000-edge workspace target and adds operational complexity.
+- Static diagram export only: useful for sharing, but does not meet the interactive Obsidian-like
+  exploration requirement.
+
 ## Decision: Soft study visual palette
 
 **Rationale**: The learner-facing frontend will use #fff8e7 as the primary background/base tone
