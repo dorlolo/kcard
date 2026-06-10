@@ -51,7 +51,7 @@ async function submit() {
 
 <template>
   <section class="material-import-page" aria-labelledby="material-import-title">
-    <div class="material-import-hero surface-accent-one">
+    <div class="material-import-hero surface-gradient-study">
       <p class="eyebrow">资料管理 · AI 知识点提取</p>
       <div>
         <h2 id="material-import-title">导入资料</h2>

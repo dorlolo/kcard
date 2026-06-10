@@ -12,7 +12,7 @@ const navItems = [
 
 <template>
   <div class="app-shell">
-    <header class="app-shell__header surface-accent-one">
+    <header class="app-shell__header surface-gradient-study">
       <h1>KCard 学习卡片</h1>
       <nav aria-label="主导航">
         <RouterLink v-for="item in navItems" :key="item.to" :to="item.to">{{ item.label }}</RouterLink>
