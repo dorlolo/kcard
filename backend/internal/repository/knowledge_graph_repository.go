@@ -3,38 +3,23 @@ package repository
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
+
+	"kcardDesgin/backend/internal/domain"
 )
 
 type GraphFilter struct {
-	WorkspaceID           string
-	FocusKnowledgePointID string
+	WorkspaceID           domain.ID
+	FocusKnowledgePointID domain.ID
 	Depth                 int
-	RelationshipTypes     []string
-	ApprovalStatus        string
+	RelationshipTypes     []domain.RelationshipType
+	ApprovalStatus        domain.ApprovalStatus
+	Query                 string
 	IncludeArchived       bool
-}
-
-type GraphNode struct {
-	ID             string
-	Label          string
-	NodeType       string
-	ApprovalStatus string
-	Weight         float64
-}
-type GraphEdge struct {
-	ID               string
-	SourceID         string
-	TargetID         string
-	RelationshipType string
-	Label            string
-	Weight           float64
-	SourceType       string
-}
-type KnowledgeGraph struct {
-	Nodes    []GraphNode
-	Edges    []GraphEdge
-	Warnings []string
+	IncludeRejected       bool
+	MaxNodes              int
+	MaxEdges              int
 }
 
 type KnowledgeGraphRepository struct{ db *gorm.DB }
@@ -43,48 +28,64 @@ func NewKnowledgeGraphRepository(db *gorm.DB) KnowledgeGraphRepository {
 	return KnowledgeGraphRepository{db: db}
 }
 
-func (r KnowledgeGraphRepository) Graph(ctx context.Context, filter GraphFilter) (KnowledgeGraph, error) {
-	var points []KnowledgePointModel
-	pointQuery := r.db.WithContext(ctx).Where("learner_workspace_id = ?", filter.WorkspaceID)
-	if filter.ApprovalStatus != "" {
-		pointQuery = pointQuery.Where("approval_status = ?", filter.ApprovalStatus)
-	}
-	if filter.FocusKnowledgePointID != "" {
-		pointQuery = pointQuery.Where("id = ? OR id IN (SELECT target_knowledge_point_id FROM knowledge_relationships WHERE source_knowledge_point_id = ?)", filter.FocusKnowledgePointID, filter.FocusKnowledgePointID)
-	}
-	if !filter.IncludeArchived {
-		pointQuery = pointQuery.Where("archived_at IS NULL")
-	}
-	if err := pointQuery.Limit(250).Find(&points).Error; err != nil {
-		return KnowledgeGraph{}, err
-	}
-	var edges []KnowledgeRelationshipModel
-	edgeQuery := r.db.WithContext(ctx).Where("learner_workspace_id = ?", filter.WorkspaceID)
-	if len(filter.RelationshipTypes) > 0 {
-		edgeQuery = edgeQuery.Where("relationship_type IN ?", filter.RelationshipTypes)
-	}
-	if !filter.IncludeArchived {
-		edgeQuery = edgeQuery.Where("archived_at IS NULL")
-	}
-	if err := edgeQuery.Limit(1000).Find(&edges).Error; err != nil {
-		return KnowledgeGraph{}, err
-	}
-	graph := KnowledgeGraph{}
-	for _, point := range points {
-		label := point.GraphLabel
-		if label == "" {
-			label = point.Summary
+func (r KnowledgeGraphRepository) ListPoints(ctx context.Context, filter GraphFilter) ([]domain.KnowledgePoint, error) {
+	return NewKnowledgeRepository(r.db).Search(ctx, domain.KnowledgeFilter{WorkspaceID: filter.WorkspaceID, Query: filter.Query, ApprovalStatus: filter.ApprovalStatus, IncludeArchived: filter.IncludeArchived, IncludeRejected: filter.IncludeRejected})
+}
+
+func (r KnowledgeGraphRepository) ListRelationships(ctx context.Context, workspaceID domain.ID, relationshipTypes []domain.RelationshipType, includeArchived bool, max int) ([]domain.KnowledgeRelationship, error) {
+	var models []KnowledgeRelationshipModel
+	q := r.db.WithContext(ctx).Where("learner_workspace_id = ?", string(workspaceID))
+	if len(relationshipTypes) > 0 {
+		types := make([]string, 0, len(relationshipTypes))
+		for _, relationshipType := range relationshipTypes {
+			types = append(types, string(relationshipType))
 		}
-		if label == "" {
-			label = point.Content
-		}
-		graph.Nodes = append(graph.Nodes, GraphNode{ID: point.ID, Label: label, NodeType: "knowledge_point", ApprovalStatus: point.ApprovalStatus, Weight: 1})
+		q = q.Where("relationship_type IN ?", types)
 	}
-	for _, edge := range edges {
-		graph.Edges = append(graph.Edges, GraphEdge{ID: edge.ID, SourceID: edge.SourceKnowledgePointID, TargetID: edge.TargetKnowledgePointID, RelationshipType: edge.RelationshipType, Label: edge.Label, Weight: edge.Weight, SourceType: edge.SourceType})
+	if !includeArchived {
+		q = q.Where("archived_at IS NULL")
 	}
-	if len(edges) >= 1000 {
-		graph.Warnings = append(graph.Warnings, "Graph was limited to 1000 edges. Narrow filters or focus a node for better readability.")
+	limit := max
+	if limit <= 0 {
+		limit = 1000
 	}
-	return graph, nil
+	if err := q.Limit(limit).Find(&models).Error; err != nil {
+		return nil, err
+	}
+	relationships := make([]domain.KnowledgeRelationship, 0, len(models))
+	for _, model := range models {
+		relationships = append(relationships, relationshipFromModel(model))
+	}
+	return relationships, nil
+}
+
+func (r KnowledgeGraphRepository) CreateRelationship(ctx context.Context, relationship domain.KnowledgeRelationship) (domain.KnowledgeRelationship, error) {
+	if relationship.ID == "" {
+		relationship.ID = domain.ID(uuid.NewString())
+	}
+	model := relationshipToModel(relationship)
+	if err := r.db.WithContext(ctx).Create(&model).Error; err != nil {
+		return domain.KnowledgeRelationship{}, err
+	}
+	return relationshipFromModel(model), nil
+}
+
+func (r KnowledgeGraphRepository) ArchiveRelationship(ctx context.Context, id domain.ID) (domain.KnowledgeRelationship, error) {
+	var model KnowledgeRelationshipModel
+	if err := r.db.WithContext(ctx).Where("id = ?", string(id)).First(&model).Error; err != nil {
+		return domain.KnowledgeRelationship{}, err
+	}
+	if err := r.db.WithContext(ctx).Model(&model).Update("archived_at", gorm.Expr("now()")).Error; err != nil {
+		return domain.KnowledgeRelationship{}, err
+	}
+	model.ArchivedAt = &model.UpdatedAt
+	return relationshipFromModel(model), nil
+}
+
+func relationshipFromModel(model KnowledgeRelationshipModel) domain.KnowledgeRelationship {
+	return domain.KnowledgeRelationship{ID: domain.ID(model.ID), WorkspaceID: domain.ID(model.LearnerWorkspaceID), SourceID: domain.ID(model.SourceKnowledgePointID), TargetID: domain.ID(model.TargetKnowledgePointID), Type: domain.RelationshipType(model.RelationshipType), Label: model.Label, Weight: model.Weight, SourceType: model.SourceType, Archived: model.ArchivedAt != nil}
+}
+
+func relationshipToModel(rel domain.KnowledgeRelationship) KnowledgeRelationshipModel {
+	return KnowledgeRelationshipModel{BaseModel: BaseModel{ID: string(rel.ID)}, LearnerWorkspaceID: string(rel.WorkspaceID), SourceKnowledgePointID: string(rel.SourceID), TargetKnowledgePointID: string(rel.TargetID), RelationshipType: string(rel.Type), Label: rel.Label, Weight: rel.Weight, SourceType: rel.SourceType}
 }

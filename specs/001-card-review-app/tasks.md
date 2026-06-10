@@ -123,28 +123,28 @@
 
 ### Tests for User Story 2 (REQUIRED) ⚠️
 
-- [ ] T059 [P] [US2] Add contract tests for knowledge point list, split, merge, update, graph, and relationship endpoints in `backend/test/contract/knowledge_contract_test.go`
-- [ ] T060 [P] [US2] Add backend unit tests for knowledge split/merge/source preservation in `backend/internal/service/knowledge_service_test.go`
-- [ ] T061 [P] [US2] Add frontend component tests for knowledge filters, duplicate warnings, list/graph view toggle, split, and merge dialogs in `frontend/src/features/knowledge/__tests__/KnowledgeLibrary.spec.ts`
-- [ ] T062 [P] [US2] Add Playwright e2e test for knowledge curation, list view, graph exploration, and node opening before card generation in `frontend/e2e/knowledge-curation.spec.ts`
-- [ ] T063 [P] [US2] Add backend unit tests for knowledge graph filtering, local-neighborhood depth, lineage, and archived/rejected visibility in `backend/internal/service/knowledge_graph_service_test.go`
-- [ ] T064 [P] [US2] Add frontend component tests for graph rendering, edge labels, node selection, relationship filters, and dense graph fallback in `frontend/src/features/knowledge/__tests__/KnowledgeGraph.spec.ts`
+- [X] T059 [P] [US2] Add contract tests for knowledge point list, split, merge, update, graph, and relationship endpoints in `backend/test/contract/knowledge_contract_test.go`
+- [X] T060 [P] [US2] Add backend unit tests for knowledge split/merge/source preservation in `backend/internal/service/knowledge_service_test.go`
+- [X] T061 [P] [US2] Add frontend component tests for knowledge filters, duplicate warnings, list/graph view toggle, split, and merge dialogs in `frontend/src/features/knowledge/__tests__/KnowledgeLibrary.spec.ts`
+- [X] T062 [P] [US2] Add Playwright e2e test for knowledge curation, list view, graph exploration, and node opening before card generation in `frontend/e2e/knowledge-curation.spec.ts`
+- [X] T063 [P] [US2] Add backend unit tests for knowledge graph filtering, local-neighborhood depth, lineage, and archived/rejected visibility in `backend/internal/service/knowledge_graph_service_test.go`
+- [X] T064 [P] [US2] Add frontend component tests for graph rendering, edge labels, node selection, relationship filters, and dense graph fallback in `frontend/src/features/knowledge/__tests__/KnowledgeGraph.spec.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T065 [P] [US2] Extend knowledge repository with search, filtering, duplicate groups, split, merge, and relationship persistence in `backend/internal/repository/knowledge_repository.go`
-- [ ] T066 [P] [US2] Create dedicated knowledge graph query repository for typed edges, derived shared-source/shared-tag links, and focused-neighborhood queries in `backend/internal/repository/knowledge_graph_repository.go`
-- [ ] T067 [US2] Implement knowledge curation use cases for search, filters, split, merge, restore, graph relationship maintenance, and approval status in `backend/internal/service/knowledge_service.go`
-- [ ] T068 [US2] Implement Obsidian-like graph use cases for searchable nodes, typed edges, filters, clustering warnings, and local-neighborhood depth in `backend/internal/service/knowledge_graph_service.go`
-- [ ] T069 [US2] Implement knowledge curation, graph, and relationship HTTP handlers in `backend/internal/transport/http/knowledge_handler.go`
-- [ ] T070 [P] [US2] Implement knowledge list, curation, graph, and relationship API service functions in `frontend/src/services/knowledge.ts`
-- [ ] T071 [P] [US2] Implement knowledge library page with list view, graph view toggle, filters, and duplicate indicators in `frontend/src/features/knowledge/KnowledgeLibraryPage.vue`
-- [ ] T072 [P] [US2] Implement split and merge dialogs in `frontend/src/features/knowledge/KnowledgeCurationDialogs.vue`
-- [ ] T073 [P] [US2] Implement Obsidian-like graph component with node selection, edge labels, filters, and accessible fallback list in `frontend/src/features/knowledge/KnowledgeGraphView.vue`
-- [ ] T074 [P] [US2] Implement graph relationship editor for learner-created related/prerequisite/supports links in `frontend/src/features/knowledge/KnowledgeRelationshipEditor.vue`
-- [ ] T075 [US2] Exclude unapproved knowledge points by default in card generation selection logic in `backend/internal/service/knowledge_selection.go`
-- [ ] T076 [US2] Validate knowledge graph switching and filtering performance within 1 second at 1,000 knowledge points and 10,000 edges in `frontend/e2e/knowledge-curation.spec.ts`
-- [ ] T077 [US2] Validate knowledge library list/graph empty, loading, error, undo, dense graph, keyboard navigation, and palette states in `frontend/src/features/knowledge/__tests__/KnowledgeLibrary.spec.ts`
+- [X] T065 [P] [US2] Extend knowledge repository with search, filtering, duplicate groups, split, merge, and relationship persistence in `backend/internal/repository/knowledge_repository.go`
+- [X] T066 [P] [US2] Create dedicated knowledge graph query repository for typed edges, derived shared-source/shared-tag links, and focused-neighborhood queries in `backend/internal/repository/knowledge_graph_repository.go`
+- [X] T067 [US2] Implement knowledge curation use cases for search, filters, split, merge, restore, graph relationship maintenance, and approval status in `backend/internal/service/knowledge_service.go`
+- [X] T068 [US2] Implement Obsidian-like graph use cases for searchable nodes, typed edges, filters, clustering warnings, and local-neighborhood depth in `backend/internal/service/knowledge_graph_service.go`
+- [X] T069 [US2] Implement knowledge curation, graph, and relationship HTTP handlers in `backend/internal/transport/http/knowledge_handler.go`
+- [X] T070 [P] [US2] Implement knowledge list, curation, graph, and relationship API service functions in `frontend/src/services/knowledge.ts`
+- [X] T071 [P] [US2] Implement knowledge library page with list view, graph view toggle, filters, and duplicate indicators in `frontend/src/features/knowledge/KnowledgeLibraryPage.vue`
+- [X] T072 [P] [US2] Implement split and merge dialogs in `frontend/src/features/knowledge/KnowledgeCurationDialogs.vue`
+- [X] T073 [P] [US2] Implement Obsidian-like graph component with node selection, edge labels, filters, and accessible fallback list in `frontend/src/features/knowledge/KnowledgeGraphView.vue`
+- [X] T074 [P] [US2] Implement graph relationship editor for learner-created related/prerequisite/supports links in `frontend/src/features/knowledge/KnowledgeRelationshipEditor.vue`
+- [X] T075 [US2] Exclude unapproved knowledge points by default in card generation selection logic in `backend/internal/service/knowledge_selection.go`
+- [X] T076 [US2] Validate knowledge graph switching and filtering performance within 1 second at 1,000 knowledge points and 10,000 edges in `frontend/e2e/knowledge-curation.spec.ts`
+- [X] T077 [US2] Validate knowledge library list/graph empty, loading, error, undo, dense graph, keyboard navigation, and palette states in `frontend/src/features/knowledge/__tests__/KnowledgeLibrary.spec.ts`
 
 **Checkpoint**: Knowledge curation list and graph views work independently and produce approved input for cards.
 

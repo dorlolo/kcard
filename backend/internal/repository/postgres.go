@@ -16,6 +16,23 @@ func OpenPostgres(databaseURL string) (*gorm.DB, error) {
 	return gorm.Open(postgres.Open(databaseURL), &gorm.Config{})
 }
 
+func AutoMigrate(db *gorm.DB) error {
+	return db.AutoMigrate(
+		&LearnerWorkspaceModel{},
+		&LearnerPreferenceModel{},
+		&VisualThemePaletteModel{},
+		&TagModel{},
+		&SourceMaterialModel{},
+		&MaterialVersionModel{},
+		&KnowledgePointModel{},
+		&KnowledgeRelationshipModel{},
+		&PromptPresetModel{},
+		&PromptSnapshotModel{},
+		&AIJobModel{},
+		&AIDraftModel{},
+	)
+}
+
 func RunMigrations(ctx context.Context, db *sql.DB, dir string) error {
 	entries, err := os.ReadDir(dir)
 	if err != nil {

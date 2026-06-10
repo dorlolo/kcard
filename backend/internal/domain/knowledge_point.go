@@ -19,6 +19,41 @@ const (
 	CreationImported    CreationSource = "imported"
 )
 
+type RelationshipType string
+
+const (
+	RelationshipRelated      RelationshipType = "related"
+	RelationshipPrerequisite RelationshipType = "prerequisite"
+	RelationshipDuplicate    RelationshipType = "duplicate"
+	RelationshipSimilar      RelationshipType = "similar"
+	RelationshipSplitFrom    RelationshipType = "split_from"
+	RelationshipMergedFrom   RelationshipType = "merged_from"
+	RelationshipSupports     RelationshipType = "supports"
+	RelationshipContradicts  RelationshipType = "contradicts"
+)
+
+type KnowledgeRelationship struct {
+	ID          ID
+	WorkspaceID ID
+	SourceID    ID
+	TargetID    ID
+	Type        RelationshipType
+	Label       string
+	Weight      float64
+	SourceType  string
+	Archived    bool
+}
+
+type KnowledgeFilter struct {
+	WorkspaceID       ID
+	Query             string
+	ApprovalStatus    ApprovalStatus
+	Tag               string
+	IncludeRejected   bool
+	IncludeArchived   bool
+	IncludeUnapproved bool
+}
+
 type KnowledgePoint struct {
 	ID                 ID             `json:"id"`
 	LearnerWorkspaceID ID             `json:"learnerWorkspaceId"`

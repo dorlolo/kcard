@@ -29,20 +29,3 @@ func (r MaterialRepository) Get(ctx context.Context, workspaceID, id string) (So
 	err := r.db.WithContext(ctx).Where("learner_workspace_id = ? AND id = ?", workspaceID, id).First(&material).Error
 	return material, err
 }
-
-type KnowledgeRepository struct{ db *gorm.DB }
-
-func NewKnowledgeRepository(db *gorm.DB) KnowledgeRepository { return KnowledgeRepository{db: db} }
-
-func (r KnowledgeRepository) UpdateStatus(ctx context.Context, workspaceID, id, status, notes string) (KnowledgePointModel, error) {
-	updates := map[string]any{"approval_status": status}
-	if notes != "" {
-		updates["notes"] = notes
-	}
-	if err := r.db.WithContext(ctx).Model(&KnowledgePointModel{}).Where("learner_workspace_id = ? AND id = ?", workspaceID, id).Updates(updates).Error; err != nil {
-		return KnowledgePointModel{}, err
-	}
-	var point KnowledgePointModel
-	err := r.db.WithContext(ctx).Where("learner_workspace_id = ? AND id = ?", workspaceID, id).First(&point).Error
-	return point, err
-}

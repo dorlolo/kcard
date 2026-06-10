@@ -26,6 +26,18 @@ func New(cfg config.Config) (*Container, error) {
 	if err != nil {
 		return nil, err
 	}
+	//sqlDB, err := db.DB()
+	//if err != nil {
+	//	return nil, err
+	//}
+	//if err := repository.RunMigrations(context.Background(), sqlDB, filepath.Join("..", "backend", "migrations")); err != nil {
+	//	if fallbackErr := repository.RunMigrations(context.Background(), sqlDB, "migrations"); fallbackErr != nil {
+	//		return nil, err
+	//	}
+	//}
+	if err = repository.AutoMigrate(db); err != nil {
+		return nil, err
+	}
 	redisClient, err := jobs.NewRedisClient(cfg.RedisURL)
 	if err != nil {
 		return nil, err

@@ -67,14 +67,14 @@ type MaterialVersionModel struct {
 type KnowledgePointModel struct {
 	BaseModel
 	LearnerWorkspaceID string
-	SourceMaterialID   string
-	MaterialVersionID  string
+	SourceMaterialID   *string
+	MaterialVersionID  *string
 	Content            string
 	Summary            string
 	Notes              string
 	ApprovalStatus     string
 	CreationSource     string
-	DuplicateGroupID   string
+	DuplicateGroupID   *string
 	GraphLabel         string
 	GraphPositionHint  string
 	AIJobID            string
@@ -96,6 +96,16 @@ type KnowledgeRelationshipModel struct {
 	CardID                 string
 	Confidence             float64
 }
+
+func (LearnerWorkspaceModel) TableName() string      { return "learner_workspaces" }
+func (LearnerPreferenceModel) TableName() string     { return "learner_preferences" }
+func (VisualThemePaletteModel) TableName() string    { return "visual_theme_palettes" }
+func (TagModel) TableName() string                   { return "tags" }
+func (SourceMaterialModel) TableName() string        { return "source_materials" }
+func (MaterialVersionModel) TableName() string       { return "material_versions" }
+func (KnowledgePointModel) TableName() string        { return "knowledge_points" }
+func (KnowledgeRelationshipModel) TableName() string { return "knowledge_relationships" }
+
 type PromptPresetModel struct {
 	BaseModel
 	LearnerWorkspaceID string
@@ -105,6 +115,9 @@ type PromptPresetModel struct {
 	IsDefault          bool
 	VersionNumber      int
 }
+
+func (PromptPresetModel) TableName() string { return "prompt_presets" }
+
 type PromptSnapshotModel struct {
 	BaseModel
 	PromptPresetID  string
@@ -114,6 +127,9 @@ type PromptSnapshotModel struct {
 	SchemaVersion   string
 	CreatedForJobID string
 }
+
+func (PromptSnapshotModel) TableName() string { return "prompt_snapshots" }
+
 type AIJobModel struct {
 	BaseModel
 	LearnerWorkspaceID string
@@ -128,6 +144,9 @@ type AIJobModel struct {
 	StartedAt          *time.Time
 	FinishedAt         *time.Time
 }
+
+func (AIJobModel) TableName() string { return "ai_jobs" }
+
 type AIDraftModel struct {
 	BaseModel
 	LearnerWorkspaceID string
@@ -139,3 +158,5 @@ type AIDraftModel struct {
 	Status             string
 	ApprovedRecordID   string
 }
+
+func (AIDraftModel) TableName() string { return "ai_drafts" }

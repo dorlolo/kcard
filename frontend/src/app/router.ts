@@ -18,7 +18,7 @@ export const router = createRouter({
   routes: [
     { path: '/', component: Placeholder, meta: { title: '首页' } },
     { path: '/materials/import', component: () => import('../features/materials/MaterialImportPage.vue'), meta: { title: '导入资料' } },
-    { path: '/knowledge', component: Placeholder, meta: { title: '知识库' } },
+    { path: '/knowledge', component: () => import('../features/knowledge/KnowledgeLibraryPage.vue'), meta: { title: '知识库' } },
     { path: '/cards', component: Placeholder, meta: { title: '卡片与卡组' } },
     { path: '/review', component: Placeholder, meta: { title: '复习会话' } },
     { path: '/plans', component: Placeholder, meta: { title: '复习计划' } },
