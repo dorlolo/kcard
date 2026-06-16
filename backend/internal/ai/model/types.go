@@ -1,5 +1,5 @@
 // Package ai 提供 AI 工作流引擎的核心抽象，包括结构化请求/响应模型和客户端接口。
-package ai
+package model
 
 import (
 	"context"

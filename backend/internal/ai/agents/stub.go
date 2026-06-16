@@ -2,11 +2,11 @@ package agents
 
 import (
 	"context"
-	"kcardDesgin/backend/internal/ai"
+	"kcardDesgin/backend/internal/ai/model"
 )
 
 type StubClient struct{ ModelID string }
 
-func (c StubClient) GenerateStructured(ctx context.Context, req ai.StructuredRequest) (ai.StructuredResponse, error) {
-	return ai.StructuredResponse{JSON: []byte(`{}`), ModelID: c.ModelID, StopReason: "stubbed"}, nil
+func (c StubClient) GenerateStructured(ctx context.Context, req model.StructuredRequest) (model.StructuredResponse, error) {
+	return model.StructuredResponse{JSON: []byte(`{}`), ModelID: c.ModelID, StopReason: "stubbed"}, nil
 }

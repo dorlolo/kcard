@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"kcardDesgin/backend/internal/ai"
+	model2 "kcardDesgin/backend/internal/ai/model"
 	"strings"
 
 	"github.com/cloudwego/eino/components/model"
@@ -16,12 +16,12 @@ type EinoClient struct {
 	ModelID string
 }
 
-func (c EinoClient) GenerateStructured(ctx context.Context, req ai.StructuredRequest) (ai.StructuredResponse, error) {
+func (c EinoClient) GenerateStructured(ctx context.Context, req model2.StructuredRequest) (model2.StructuredResponse, error) {
 	if c.Model == nil {
-		return ai.StructuredResponse{}, errors.New("eino chat model is not configured")
+		return model2.StructuredResponse{}, errors.New("eino chat model is not configured")
 	}
 	if len(req.Schema) > 0 && !json.Valid(req.Schema) {
-		return ai.StructuredResponse{}, errors.New("structured output schema is not valid JSON")
+		return model2.StructuredResponse{}, errors.New("structured output schema is not valid JSON")
 	}
 	messages := make([]*schema.Message, 0, len(req.Messages)+1)
 	if strings.TrimSpace(req.System) != "" {
@@ -43,16 +43,16 @@ func (c EinoClient) GenerateStructured(ctx context.Context, req ai.StructuredReq
 	}
 	response, err := c.Model.Generate(ctx, messages, opts...)
 	if err != nil {
-		return ai.StructuredResponse{}, err
+		return model2.StructuredResponse{}, err
 	}
 	jsonBytes, err := extractJSONObject(response.Content)
 	if err != nil {
-		return ai.StructuredResponse{}, err
+		return model2.StructuredResponse{}, err
 	}
-	return ai.StructuredResponse{JSON: jsonBytes, ModelID: c.ModelID, StopReason: "stop"}, nil
+	return model2.StructuredResponse{JSON: jsonBytes, ModelID: c.ModelID, StopReason: "stop"}, nil
 }
 
-func buildStructuredSystem(req ai.StructuredRequest) string {
+func buildStructuredSystem(req model2.StructuredRequest) string {
 	var builder strings.Builder
 	builder.WriteString(req.System)
 	builder.WriteString("\n\n请严格输出 JSON 对象，不要输出 Markdown、解释或代码块。")

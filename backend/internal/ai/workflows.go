@@ -4,6 +4,7 @@ package ai
 import (
 	"context"
 	"encoding/json"
+	"kcardDesgin/backend/internal/ai/model"
 
 	"kcardDesgin/backend/internal/ai/schemas"
 )
@@ -37,13 +38,13 @@ type WorkflowOutput struct {
 }
 
 // Workflows 封装 AI 客户端，提供执行各种工作流的通用能力。
-type Workflows struct{ Client Client }
+type Workflows struct{ Client model.Client }
 
 // Run 执行指定类型的工作流，返回工作流输出或错误。
 func (w Workflows) Run(ctx context.Context, kind WorkflowKind, input WorkflowInput) (WorkflowOutput, error) {
 	schemaBytes := schemaForKind(kind)
 	payload, _ := json.Marshal(input.Payload)
-	resp, err := w.Client.GenerateStructured(ctx, StructuredRequest{System: string(kind), Messages: []Message{{Role: "user", Content: input.Prompt + "\n" + string(payload)}}, SchemaName: string(kind), Schema: schemaBytes, MaxTokens: 4096})
+	resp, err := w.Client.GenerateStructured(ctx, model.StructuredRequest{System: string(kind), Messages: []model.Message{{Role: "user", Content: input.Prompt + "\n" + string(payload)}}, SchemaName: string(kind), Schema: schemaBytes, MaxTokens: 4096})
 	if err != nil {
 		return WorkflowOutput{}, err
 	}

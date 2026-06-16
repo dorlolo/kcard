@@ -2,13 +2,14 @@ package ai
 
 import (
 	"context"
+	"kcardDesgin/backend/internal/ai/model"
 	"testing"
 )
 
 type fakeClient struct{ body []byte }
 
-func (f fakeClient) GenerateStructured(ctx context.Context, req StructuredRequest) (StructuredResponse, error) {
-	return StructuredResponse{JSON: f.body, ModelID: "test", StopReason: "end"}, nil
+func (f fakeClient) GenerateStructured(ctx context.Context, req model.StructuredRequest) (model.StructuredResponse, error) {
+	return model.StructuredResponse{JSON: f.body, ModelID: "test", StopReason: "end"}, nil
 }
 
 func TestClassificationWorkflowParsesStructuredOutput(t *testing.T) {

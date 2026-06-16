@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"kcardDesgin/backend/internal/ai/model"
 	"strings"
 
 	"kcardDesgin/backend/internal/ai/schemas"
@@ -17,6 +18,7 @@ type KnowledgePointDraft struct {
 	Tags       []string `json:"tags"`
 	Confidence float64  `json:"confidence"`
 }
+
 // ClassificationOutput 定义分类工作流的输出，包含知识点列表和警告信息。
 type ClassificationOutput struct {
 	KnowledgePoints []KnowledgePointDraft `json:"knowledgePoints"`
@@ -25,7 +27,7 @@ type ClassificationOutput struct {
 
 // ClassificationWorkflow 封装知识分类工作流，包含 AI 客户端和默认提示词。
 type ClassificationWorkflow struct {
-	Client        Client
+	Client        model.Client
 	DefaultPrompt string
 }
 
@@ -37,7 +39,7 @@ func (w ClassificationWorkflow) Classify(ctx context.Context, materialText, prom
 	if prompt == "" {
 		prompt = w.DefaultPrompt
 	}
-	resp, err := w.Client.GenerateStructured(ctx, StructuredRequest{System: prompt, Messages: []Message{{Role: "user", Content: materialText}}, SchemaName: "knowledge_classification", Schema: schemas.KnowledgeClassification, MaxTokens: 4096})
+	resp, err := w.Client.GenerateStructured(ctx, model.StructuredRequest{System: prompt, Messages: []model.Message{{Role: "user", Content: materialText}}, SchemaName: "knowledge_classification", Schema: schemas.KnowledgeClassification, MaxTokens: 4096})
 	if err != nil {
 		return ClassificationOutput{}, err
 	}

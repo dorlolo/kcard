@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"kcardDesgin/backend/internal/ai/agents/classifier"
+	"kcardDesgin/backend/internal/ai/model"
 	"log/slog"
 	"os"
 	"time"
@@ -33,7 +35,7 @@ func main() {
 	queue := jobs.NewQueue(container.Redis, jobs.DefaultQueueName)
 	materialRepo := repository.NewMaterialRepository(container.DB)
 	knowledgeRepo := repository.NewKnowledgeRepository(container.DB)
-	aiClient, err := ai.NewClient(context.Background(), model.ClientConfig{Provider: cfg.AIProvider, APIKey: cfg.ArkAPIKey, ModelID: cfg.ArkModel, BaseURL: cfg.ArkBaseURL, UseStub: cfg.ArkAPIKey == ""})
+	aiClient, err := classifier.NewAgentWithClient(context.Background(), model.ModelConfig{Provider: cfg.AIProvider, APIKey: cfg.ArkAPIKey, ModelID: cfg.ArkModel, BaseURL: cfg.ArkBaseURL}, cfg.ArkAPIKey == "")
 	if err != nil {
 		slog.Error("ai client configuration failed", "error", err)
 		os.Exit(1)
