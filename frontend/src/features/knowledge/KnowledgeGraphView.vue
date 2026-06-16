@@ -5,24 +5,28 @@ import type { KnowledgeGraph } from '../../services/knowledge'
 const props = defineProps<{ graph: KnowledgeGraph; selectedNodeId?: string }>()
 const emit = defineEmits<{ selectNode: [id: string] }>()
 
+const graphNodes = computed(() => props.graph?.nodes ?? [])
+const graphEdges = computed(() => props.graph?.edges ?? [])
+const graphWarnings = computed(() => props.graph?.warnings ?? [])
+
 const positionedNodes = computed(() => {
   const radius = 145
   const centerX = 380
   const centerY = 210
-  const total = Math.max(props.graph.nodes.length, 1)
-  return props.graph.nodes.map((node, index) => {
+  const total = Math.max(graphNodes.value.length, 1)
+  return graphNodes.value.map((node, index) => {
     const angle = (Math.PI * 2 * index) / total - Math.PI / 2
     return { ...node, x: centerX + Math.cos(angle) * radius, y: centerY + Math.sin(angle) * radius }
   })
 })
 
 const nodeMap = computed(() => new Map(positionedNodes.value.map((node) => [node.id, node])))
-const visibleEdges = computed(() => props.graph.edges.map((edge) => ({ ...edge, source: nodeMap.value.get(edge.sourceId), target: nodeMap.value.get(edge.targetId) })).filter((edge) => edge.source && edge.target))
+const visibleEdges = computed(() => graphEdges.value.map((edge) => ({ ...edge, source: nodeMap.value.get(edge.sourceId), target: nodeMap.value.get(edge.targetId) })).filter((edge) => edge.source && edge.target))
 </script>
 
 <template>
   <section class="knowledge-graph surface-accent-two" aria-label="知识关系图谱">
-    <p v-if="graph.warnings?.length" class="graph-warning" role="status">{{ graph.warnings.join(' ') }}</p>
+    <p v-if="graphWarnings.length" class="graph-warning" role="status">{{ graphWarnings.join(' ') }}</p>
     <svg viewBox="0 0 760 430" role="img" aria-label="类 Obsidian 知识图谱">
       <g v-for="edge in visibleEdges" :key="edge.id">
         <line :x1="edge.source!.x" :y1="edge.source!.y" :x2="edge.target!.x" :y2="edge.target!.y" stroke="var(--color-muted)" stroke-width="1.5" />
@@ -50,7 +54,7 @@ const visibleEdges = computed(() => props.graph.edges.map((edge) => ({ ...edge, 
     <details>
       <summary>可访问的图谱列表</summary>
       <ul>
-        <li v-for="node in graph.nodes" :key="node.id">
+        <li v-for="node in graphNodes" :key="node.id">
           <button type="button" @click="emit('selectNode', node.id)">{{ node.label }}</button>
         </li>
       </ul>

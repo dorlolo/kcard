@@ -1,3 +1,4 @@
+// Package repository 提供数据模型定义和数据库访问接口的实现。
 package repository
 
 import (
@@ -12,10 +13,12 @@ import (
 	"gorm.io/gorm"
 )
 
+// OpenPostgres 打开 PostgreSQL 数据库连接并返回 GORM DB 实例。
 func OpenPostgres(databaseURL string) (*gorm.DB, error) {
 	return gorm.Open(postgres.Open(databaseURL), &gorm.Config{})
 }
 
+// AutoMigrate 执行数据库自动迁移，创建所有模型对应的数据表。
 func AutoMigrate(db *gorm.DB) error {
 	return db.AutoMigrate(
 		&LearnerWorkspaceModel{},
@@ -33,6 +36,7 @@ func AutoMigrate(db *gorm.DB) error {
 	)
 }
 
+// RunMigrations 执行指定目录下的 SQL 迁移文件，确保每个文件只执行一次。
 func RunMigrations(ctx context.Context, db *sql.DB, dir string) error {
 	entries, err := os.ReadDir(dir)
 	if err != nil {

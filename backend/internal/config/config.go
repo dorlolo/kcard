@@ -1,3 +1,4 @@
+// Package config 提供应用程序配置的加载与验证功能。
 package config
 
 import (
@@ -11,19 +12,23 @@ import (
 	"time"
 )
 
+// Config 表示应用程序配置，包含 HTTP、数据库、Redis、AI 及存储等各项参数。
 type Config struct {
-	HTTPAddr               string
-	DatabaseURL            string
-	RedisURL               string
-	StoragePath            string
-	AnthropicAPIKey        string
-	AnthropicModel         string
-	AllowedFrontendOrigin  string
-	JobVisibilityTimeout   time.Duration
-	DefaultWorkspaceName   string
-	RequireAnthropicAPIKey bool
+	HTTPAddr              string
+	DatabaseURL           string
+	RedisURL              string
+	StoragePath           string
+	AIProvider            string
+	ArkAPIKey             string
+	ArkModel              string
+	ArkBaseURL            string
+	AllowedFrontendOrigin string
+	JobVisibilityTimeout  time.Duration
+	DefaultWorkspaceName  string
+	RequireAIAPIKey       bool
 }
 
+// Load 从环境变量加载配置并执行验证，返回有效的 Config 实例。
 func Load() (Config, error) {
 	if err := loadDotEnv(); err != nil {
 		return Config{}, err
@@ -34,8 +39,10 @@ func Load() (Config, error) {
 		DatabaseURL:           env("DATABASE_URL", "postgres://kcard:kcard@localhost:5432/kcard?sslmode=disable"),
 		RedisURL:              env("REDIS_URL", "redis://localhost:6379/0"),
 		StoragePath:           env("STORAGE_PATH", ".local/storage"),
-		AnthropicAPIKey:       os.Getenv("ANTHROPIC_API_KEY"),
-		AnthropicModel:        env("ANTHROPIC_MODEL", "claude-opus-4-8"),
+		AIProvider:            env("AI_PROVIDER", "ark"),
+		ArkAPIKey:             os.Getenv("ARK_API_KEY"),
+		ArkModel:              env("ARK_MODEL", ""),
+		ArkBaseURL:            env("ARK_BASE_URL", "https://ark.cn-beijing.volces.com/api/v3"),
 		AllowedFrontendOrigin: env("FRONTEND_ORIGIN", "http://localhost:5173"),
 		DefaultWorkspaceName:  env("DEFAULT_WORKSPACE_NAME", "My Study Workspace"),
 	}
@@ -44,10 +51,11 @@ func Load() (Config, error) {
 		return Config{}, fmt.Errorf("JOB_VISIBILITY_TIMEOUT_SECONDS must be a positive integer")
 	}
 	cfg.JobVisibilityTimeout = time.Duration(seconds) * time.Second
-	cfg.RequireAnthropicAPIKey = strings.EqualFold(env("REQUIRE_ANTHROPIC_API_KEY", "false"), "true")
+	cfg.RequireAIAPIKey = strings.EqualFold(env("REQUIRE_AI_API_KEY", "false"), "true")
 	return cfg, cfg.Validate()
 }
 
+// Validate 检查配置中必需字段是否已设置，返回缺失项的错误描述。
 func (c Config) Validate() error {
 	var missing []string
 	if c.DatabaseURL == "" {
@@ -62,8 +70,11 @@ func (c Config) Validate() error {
 	if c.AllowedFrontendOrigin == "" {
 		missing = append(missing, "FRONTEND_ORIGIN")
 	}
-	if c.RequireAnthropicAPIKey && c.AnthropicAPIKey == "" {
-		missing = append(missing, "ANTHROPIC_API_KEY")
+	if c.RequireAIAPIKey && c.ArkAPIKey == "" {
+		missing = append(missing, "ARK_API_KEY")
+	}
+	if c.ArkAPIKey != "" && c.ArkModel == "" {
+		missing = append(missing, "ARK_MODEL")
 	}
 	if len(missing) > 0 {
 		return errors.New("missing required configuration: " + strings.Join(missing, ", "))

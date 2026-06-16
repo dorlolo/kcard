@@ -128,6 +128,7 @@ async function submit() {
         <section class="surface-accent-two preview-card">
           <h3>状态预览</h3>
           <StateViews :state="status" title="资料导入" :message="message" />
+          <RouterLink v-if="status === 'success'" class="primary-action knowledge-link" to="/knowledge">前往知识库审阅</RouterLink>
         </section>
       </aside>
     </div>

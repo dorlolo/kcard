@@ -1,3 +1,4 @@
+// Package service 提供领域服务层的实现，包括资料、卡片、知识图谱等核心业务逻辑。
 package service
 
 import (
@@ -9,19 +10,29 @@ import (
 	"kcardDesgin/backend/internal/domain"
 )
 
+// RelationshipType 是 domain.RelationshipType 的类型别名，表示知识点间的关系类型。
 type RelationshipType = domain.RelationshipType
 
 const (
+	// RelationshipRelated 常量表示知识点之间的关联关系。
 	RelationshipRelated      = domain.RelationshipRelated
+	// RelationshipPrerequisite 常量表示知识点之间的前置依赖关系。
 	RelationshipPrerequisite = domain.RelationshipPrerequisite
+	// RelationshipDuplicate 常量表示知识点之间的重复关系。
 	RelationshipDuplicate    = domain.RelationshipDuplicate
+	// RelationshipSimilar 常量表示知识点之间的相似关系。
 	RelationshipSimilar      = domain.RelationshipSimilar
+	// RelationshipSplitFrom 常量表示知识点之间的拆分来源关系。
 	RelationshipSplitFrom    = domain.RelationshipSplitFrom
+	// RelationshipMergedFrom 常量表示知识点之间的合并来源关系。
 	RelationshipMergedFrom   = domain.RelationshipMergedFrom
+	// RelationshipSupports 常量表示知识点之间的支持关系。
 	RelationshipSupports     = domain.RelationshipSupports
+	// RelationshipContradicts 常量表示知识点之间的矛盾关系。
 	RelationshipContradicts  = domain.RelationshipContradicts
 )
 
+// KnowledgeRelationship 是 domain.KnowledgeRelationship 的类型别名，表示知识点之间的关系。
 type KnowledgeRelationship = domain.KnowledgeRelationship
 
 type KnowledgeGraphNode struct {

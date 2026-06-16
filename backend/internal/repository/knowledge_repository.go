@@ -1,3 +1,4 @@
+// Package repository 提供数据模型定义和数据库访问接口的实现。
 package repository
 
 import (
@@ -11,12 +12,15 @@ import (
 	"kcardDesgin/backend/internal/domain"
 )
 
+// KnowledgeRepository 处理知识点数据的持久化操作。
 type KnowledgeRepository struct{ db *gorm.DB }
 
+// NewKnowledgeRepository 创建 KnowledgeRepository 实例。
 func NewKnowledgeRepository(db *gorm.DB) KnowledgeRepository {
 	return KnowledgeRepository{db: db}
 }
 
+// Search 根据筛选条件搜索知识点列表。
 func (r KnowledgeRepository) Search(ctx context.Context, filter domain.KnowledgeFilter) ([]domain.KnowledgePoint, error) {
 	var models []KnowledgePointModel
 	q := r.db.WithContext(ctx).Where("learner_workspace_id = ?", string(filter.WorkspaceID))
@@ -43,6 +47,7 @@ func (r KnowledgeRepository) Search(ctx context.Context, filter domain.Knowledge
 	return points, nil
 }
 
+// Get 根据 ID 获取指定工作区中的知识点。
 func (r KnowledgeRepository) Get(ctx context.Context, workspaceID domain.ID, id domain.ID) (domain.KnowledgePoint, error) {
 	var model KnowledgePointModel
 	err := r.db.WithContext(ctx).Where("learner_workspace_id = ? AND id = ?", string(workspaceID), string(id)).First(&model).Error
@@ -52,6 +57,7 @@ func (r KnowledgeRepository) Get(ctx context.Context, workspaceID domain.ID, id 
 	return knowledgePointFromModel(model), nil
 }
 
+// Create 创建新的知识点记录。
 func (r KnowledgeRepository) Create(ctx context.Context, point domain.KnowledgePoint) (domain.KnowledgePoint, error) {
 	if point.ID == "" {
 		point.ID = domain.ID(uuid.NewString())
@@ -63,6 +69,7 @@ func (r KnowledgeRepository) Create(ctx context.Context, point domain.KnowledgeP
 	return knowledgePointFromModel(model), nil
 }
 
+// Save 保存知识点记录（创建或更新）。
 func (r KnowledgeRepository) Save(ctx context.Context, point domain.KnowledgePoint) (domain.KnowledgePoint, error) {
 	model := knowledgePointToModel(point)
 	if err := r.db.WithContext(ctx).Save(&model).Error; err != nil {
@@ -71,6 +78,7 @@ func (r KnowledgeRepository) Save(ctx context.Context, point domain.KnowledgePoi
 	return knowledgePointFromModel(model), nil
 }
 
+// UpdateStatus 更新知识点的审批状态和备注。
 func (r KnowledgeRepository) UpdateStatus(ctx context.Context, workspaceID domain.ID, id domain.ID, status domain.ApprovalStatus, notes string, now time.Time) (domain.KnowledgePoint, error) {
 	point, err := r.Get(ctx, workspaceID, id)
 	if err != nil {

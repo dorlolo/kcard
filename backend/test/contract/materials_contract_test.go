@@ -24,7 +24,7 @@ func TestCreateMaterialContract(t *testing.T) {
 
 func TestKnowledgeUpdateContract(t *testing.T) {
 	router := httpapi.NewRouter(&app.Container{})
-	req := httptest.NewRequest(http.MethodPatch, "/api/v1/knowledge-points/kp-1", bytes.NewBufferString(`{"approvalStatus":"approved"}`))
+	req := httptest.NewRequest(http.MethodPatch, "/api/v1/knowledge-points/kp-cell", bytes.NewBufferString(`{"approvalStatus":"approved"}`))
 	req.Header.Set("Content-Type", "application/json")
 	res := httptest.NewRecorder()
 	router.ServeHTTP(res, req)

@@ -1,3 +1,4 @@
+// Package middleware 提供HTTP中间件。
 package middleware
 
 import (
@@ -6,8 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// WorkspaceIDKey 常量定义工作空间ID在上下文中的键名。
 const WorkspaceIDKey = "workspaceID"
 
+// PlaceholderAuth 返回一个占位认证中间件，从请求头提取工作空间ID并注入上下文。
 func PlaceholderAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		workspaceID := c.GetHeader("X-Workspace-ID")

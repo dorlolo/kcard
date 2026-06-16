@@ -2,11 +2,19 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"log/slog"
 	"os"
+	"time"
 
+	"github.com/redis/go-redis/v9"
+
+	"kcardDesgin/backend/internal/ai"
 	"kcardDesgin/backend/internal/app"
 	"kcardDesgin/backend/internal/config"
+	"kcardDesgin/backend/internal/jobs"
+	"kcardDesgin/backend/internal/repository"
 )
 
 func main() {
@@ -21,5 +29,45 @@ func main() {
 		os.Exit(1)
 	}
 	defer container.Close(context.Background())
-	slog.Info("worker ready", "queue", cfg.RedisURL)
+
+	queue := jobs.NewQueue(container.Redis, jobs.DefaultQueueName)
+	materialRepo := repository.NewMaterialRepository(container.DB)
+	knowledgeRepo := repository.NewKnowledgeRepository(container.DB)
+	aiClient, err := ai.NewClient(context.Background(), model.ClientConfig{Provider: cfg.AIProvider, APIKey: cfg.ArkAPIKey, ModelID: cfg.ArkModel, BaseURL: cfg.ArkBaseURL, UseStub: cfg.ArkAPIKey == ""})
+	if err != nil {
+		slog.Error("ai client configuration failed", "error", err)
+		os.Exit(1)
+	}
+	worker := jobs.MaterialAnalysisWorker{Workflow: ai.ClassificationWorkflow{Client: aiClient, DefaultPrompt: "请提取适合制作复习卡片的原子化知识点。"}, Materials: materialRepo, Knowledge: knowledgeRepo}
+
+	slog.Info("worker ready", "queue", jobs.DefaultQueueName)
+	for {
+		if err := handleNext(context.Background(), queue, worker); err != nil {
+			if errors.Is(err, redis.Nil) {
+				continue
+			}
+			slog.Error("job handling failed", "error", err)
+		}
+	}
+}
+
+func handleNext(ctx context.Context, queue jobs.Queue, materialWorker jobs.MaterialAnalysisWorker) error {
+	envelope, err := queue.Pop(ctx, 5*time.Second)
+	if err != nil {
+		return err
+	}
+	switch envelope.Job.Type {
+	case jobs.JobTypeMaterialAnalysis:
+		var payload jobs.MaterialAnalysisPayload
+		if err := json.Unmarshal(envelope.Payload, &payload); err != nil {
+			return err
+		}
+		_, err := materialWorker.Handle(ctx, payload)
+		return err
+	case "":
+		return nil
+	default:
+		slog.Warn("unknown job type", "type", envelope.Job.Type)
+		return nil
+	}
 }

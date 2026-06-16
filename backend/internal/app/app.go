@@ -1,3 +1,4 @@
+// Package app 提供应用程序的依赖容器与生命周期管理。
 package app
 
 import (
@@ -13,6 +14,7 @@ import (
 	"kcardDesgin/backend/internal/storage"
 )
 
+// Container 表示应用程序的依赖容器，持有配置、数据库、Redis、存储和日志器等核心依赖。
 type Container struct {
 	Config config.Config
 	DB     *gorm.DB
@@ -21,20 +23,12 @@ type Container struct {
 	Logger *slog.Logger
 }
 
+// New 根据配置创建并初始化 Container，包括数据库连接、自动迁移、Redis 客户端和本地存储。
 func New(cfg config.Config) (*Container, error) {
 	db, err := repository.OpenPostgres(cfg.DatabaseURL)
 	if err != nil {
 		return nil, err
 	}
-	//sqlDB, err := db.DB()
-	//if err != nil {
-	//	return nil, err
-	//}
-	//if err := repository.RunMigrations(context.Background(), sqlDB, filepath.Join("..", "backend", "migrations")); err != nil {
-	//	if fallbackErr := repository.RunMigrations(context.Background(), sqlDB, "migrations"); fallbackErr != nil {
-	//		return nil, err
-	//	}
-	//}
 	if err = repository.AutoMigrate(db); err != nil {
 		return nil, err
 	}
@@ -51,6 +45,7 @@ func New(cfg config.Config) (*Container, error) {
 	}, nil
 }
 
+// Close 关闭容器持有的 Redis 连接，释放相关资源。
 func (c *Container) Close(ctx context.Context) error {
 	if c.Redis != nil {
 		return c.Redis.Close()

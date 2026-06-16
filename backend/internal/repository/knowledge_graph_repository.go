@@ -1,3 +1,4 @@
+// Package repository 提供数据模型定义和数据库访问接口的实现。
 package repository
 
 import (
@@ -9,6 +10,7 @@ import (
 	"kcardDesgin/backend/internal/domain"
 )
 
+// GraphFilter 表示知识图谱的筛选条件。
 type GraphFilter struct {
 	WorkspaceID           domain.ID
 	FocusKnowledgePointID domain.ID
@@ -22,16 +24,20 @@ type GraphFilter struct {
 	MaxEdges              int
 }
 
+// KnowledgeGraphRepository 处理知识图谱数据的持久化操作。
 type KnowledgeGraphRepository struct{ db *gorm.DB }
 
+// NewKnowledgeGraphRepository 创建 KnowledgeGraphRepository 实例。
 func NewKnowledgeGraphRepository(db *gorm.DB) KnowledgeGraphRepository {
 	return KnowledgeGraphRepository{db: db}
 }
 
+// ListPoints 根据图谱筛选条件返回知识点列表。
 func (r KnowledgeGraphRepository) ListPoints(ctx context.Context, filter GraphFilter) ([]domain.KnowledgePoint, error) {
 	return NewKnowledgeRepository(r.db).Search(ctx, domain.KnowledgeFilter{WorkspaceID: filter.WorkspaceID, Query: filter.Query, ApprovalStatus: filter.ApprovalStatus, IncludeArchived: filter.IncludeArchived, IncludeRejected: filter.IncludeRejected})
 }
 
+// ListRelationships 返回指定工作区中的知识关系列表。
 func (r KnowledgeGraphRepository) ListRelationships(ctx context.Context, workspaceID domain.ID, relationshipTypes []domain.RelationshipType, includeArchived bool, max int) ([]domain.KnowledgeRelationship, error) {
 	var models []KnowledgeRelationshipModel
 	q := r.db.WithContext(ctx).Where("learner_workspace_id = ?", string(workspaceID))
@@ -59,6 +65,7 @@ func (r KnowledgeGraphRepository) ListRelationships(ctx context.Context, workspa
 	return relationships, nil
 }
 
+// CreateRelationship 创建新的知识关系记录。
 func (r KnowledgeGraphRepository) CreateRelationship(ctx context.Context, relationship domain.KnowledgeRelationship) (domain.KnowledgeRelationship, error) {
 	if relationship.ID == "" {
 		relationship.ID = domain.ID(uuid.NewString())
@@ -70,6 +77,7 @@ func (r KnowledgeGraphRepository) CreateRelationship(ctx context.Context, relati
 	return relationshipFromModel(model), nil
 }
 
+// ArchiveRelationship 根据 ID 归档知识关系。
 func (r KnowledgeGraphRepository) ArchiveRelationship(ctx context.Context, id domain.ID) (domain.KnowledgeRelationship, error) {
 	var model KnowledgeRelationshipModel
 	if err := r.db.WithContext(ctx).Where("id = ?", string(id)).First(&model).Error; err != nil {

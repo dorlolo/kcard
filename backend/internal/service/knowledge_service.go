@@ -1,3 +1,4 @@
+// Package service 提供领域服务层的实现，包括资料、卡片、知识图谱等核心业务逻辑。
 package service
 
 import (
@@ -10,8 +11,10 @@ import (
 	"kcardDesgin/backend/internal/domain"
 )
 
+// KnowledgeFilter 是 domain.KnowledgeFilter 的类型别名，表示知识筛选条件。
 type KnowledgeFilter = domain.KnowledgeFilter
 
+// KnowledgeStore 定义知识存储的持久化接口。
 type KnowledgeStore interface {
 	Search(ctx context.Context, filter domain.KnowledgeFilter) ([]domain.KnowledgePoint, error)
 	Get(ctx context.Context, workspaceID domain.ID, id domain.ID) (domain.KnowledgePoint, error)
@@ -20,18 +23,22 @@ type KnowledgeStore interface {
 	UpdateStatus(ctx context.Context, workspaceID domain.ID, id domain.ID, status domain.ApprovalStatus, notes string, now time.Time) (domain.KnowledgePoint, error)
 }
 
+// KnowledgeService 处理知识点的搜索、拆分、合并和状态更新操作。
 type KnowledgeService struct {
 	Store KnowledgeStore
 }
 
+// NewKnowledgeService 创建基于内存存储的 KnowledgeService 实例。
 func NewKnowledgeService(points []domain.KnowledgePoint) *KnowledgeService {
 	return &KnowledgeService{Store: NewMemoryKnowledgeStore(points)}
 }
 
+// NewPersistentKnowledgeService 创建基于持久化存储的 KnowledgeService 实例。
 func NewPersistentKnowledgeService(store KnowledgeStore) *KnowledgeService {
 	return &KnowledgeService{Store: store}
 }
 
+// Search 根据筛选条件搜索知识点，忽略错误直接返回结果。
 func (s *KnowledgeService) Search(ctx context.Context, filter domain.KnowledgeFilter) []domain.KnowledgePoint {
 	points, err := s.Store.Search(ctx, filter)
 	if err != nil {
@@ -40,14 +47,17 @@ func (s *KnowledgeService) Search(ctx context.Context, filter domain.KnowledgeFi
 	return points
 }
 
+// SearchWithError 根据筛选条件搜索知识点，同时返回错误信息。
 func (s *KnowledgeService) SearchWithError(ctx context.Context, filter domain.KnowledgeFilter) ([]domain.KnowledgePoint, error) {
 	return s.Store.Search(ctx, filter)
 }
 
+// UpdateStatus 更新知识点的审批状态和备注信息。
 func (s *KnowledgeService) UpdateStatus(ctx context.Context, workspaceID domain.ID, id domain.ID, status domain.ApprovalStatus, notes string, now time.Time) (domain.KnowledgePoint, error) {
 	return s.Store.UpdateStatus(ctx, workspaceID, id, status, notes, now)
 }
 
+// Split 将指定知识点拆分为多个新知识点并标记原知识点待审核。
 func (s *KnowledgeService) Split(ctx context.Context, workspaceID domain.ID, id domain.ID, contents []string) ([]domain.KnowledgePoint, error) {
 	source, err := s.Store.Get(ctx, workspaceID, id)
 	if err != nil {
@@ -84,6 +94,7 @@ func (s *KnowledgeService) Split(ctx context.Context, workspaceID domain.ID, id 
 	return out, nil
 }
 
+// Merge 将多个知识点合并为一个新知识点并标记原知识点待审核。
 func (s *KnowledgeService) Merge(ctx context.Context, workspaceID domain.ID, ids []domain.ID, content string) (domain.KnowledgePoint, error) {
 	if len(ids) < 2 {
 		return domain.KnowledgePoint{}, errors.New("merge requires at least two points")
@@ -127,10 +138,12 @@ func (s *KnowledgeService) Merge(ctx context.Context, workspaceID domain.ID, ids
 	return created, nil
 }
 
+// MemoryKnowledgeStore 实现 KnowledgeStore 接口的内存存储，用于测试和开发。
 type MemoryKnowledgeStore struct {
 	Points map[domain.ID]domain.KnowledgePoint
 }
 
+// NewMemoryKnowledgeStore 创建基于初始知识点列表的内存知识存储实例。
 func NewMemoryKnowledgeStore(points []domain.KnowledgePoint) *MemoryKnowledgeStore {
 	store := &MemoryKnowledgeStore{Points: map[domain.ID]domain.KnowledgePoint{}}
 	for _, point := range points {
@@ -139,6 +152,7 @@ func NewMemoryKnowledgeStore(points []domain.KnowledgePoint) *MemoryKnowledgeSto
 	return store
 }
 
+// Search 根据筛选条件从内存中搜索知识点，支持文本、标签和状态过滤。
 func (s *MemoryKnowledgeStore) Search(ctx context.Context, filter domain.KnowledgeFilter) ([]domain.KnowledgePoint, error) {
 	query := strings.ToLower(strings.TrimSpace(filter.Query))
 	tag := strings.ToLower(strings.TrimSpace(filter.Tag))
@@ -165,6 +179,7 @@ func (s *MemoryKnowledgeStore) Search(ctx context.Context, filter domain.Knowled
 	return out, nil
 }
 
+// Get 根据工作区和 ID 从内存中获取单个知识点。
 func (s *MemoryKnowledgeStore) Get(ctx context.Context, workspaceID domain.ID, id domain.ID) (domain.KnowledgePoint, error) {
 	point, ok := s.Points[id]
 	if !ok || point.LearnerWorkspaceID != workspaceID {
@@ -173,6 +188,7 @@ func (s *MemoryKnowledgeStore) Get(ctx context.Context, workspaceID domain.ID, i
 	return point, nil
 }
 
+// Create 往内存存储中创建新的知识点记录。
 func (s *MemoryKnowledgeStore) Create(ctx context.Context, point domain.KnowledgePoint) (domain.KnowledgePoint, error) {
 	if s.Points == nil {
 		s.Points = map[domain.ID]domain.KnowledgePoint{}
@@ -181,10 +197,12 @@ func (s *MemoryKnowledgeStore) Create(ctx context.Context, point domain.Knowledg
 	return point, nil
 }
 
+// Save 保存知识点到内存存储，若已存在则覆盖。
 func (s *MemoryKnowledgeStore) Save(ctx context.Context, point domain.KnowledgePoint) (domain.KnowledgePoint, error) {
 	return s.Create(ctx, point)
 }
 
+// UpdateStatus 更新内存中知识点的审批状态、备注和审批时间。
 func (s *MemoryKnowledgeStore) UpdateStatus(ctx context.Context, workspaceID domain.ID, id domain.ID, status domain.ApprovalStatus, notes string, now time.Time) (domain.KnowledgePoint, error) {
 	point, err := s.Get(ctx, workspaceID, id)
 	if err != nil {

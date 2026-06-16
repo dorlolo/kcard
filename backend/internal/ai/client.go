@@ -1,37 +1,14 @@
+// Package ai 提供 AI 工作流引擎的核心抽象，包括结构化请求/响应模型和客户端接口。
 package ai
 
-import "context"
+import (
+	"kcardDesgin/backend/internal/ai/agents"
+)
 
-type Message struct {
-	Role    string
-	Content string
-}
-type StructuredRequest struct {
-	System     string
-	Messages   []Message
-	SchemaName string
-	Schema     []byte
-	MaxTokens  int
-}
-type StructuredResponse struct {
-	JSON       []byte
-	ModelID    string
-	StopReason string
-}
+// StubClient 是模拟客户端，用于测试场景。
+// StubClient 是 agents.StubClient 的类型别名。
+type StubClient = agents.StubClient
 
-type Client interface {
-	GenerateStructured(ctx context.Context, req StructuredRequest) (StructuredResponse, error)
-}
-
-type AnthropicClient struct {
-	APIKey  string
-	ModelID string
-}
-
-func NewAnthropicClient(apiKey, modelID string) AnthropicClient {
-	return AnthropicClient{APIKey: apiKey, ModelID: modelID}
-}
-
-func (c AnthropicClient) GenerateStructured(ctx context.Context, req StructuredRequest) (StructuredResponse, error) {
-	return StructuredResponse{JSON: []byte(`{}`), ModelID: c.ModelID, StopReason: "stubbed"}, nil
-}
+// EinoClient 是基于 Eino 框架的 AI 客户端实现。
+// EinoClient 是 agents.EinoClient 的类型别名。
+type EinoClient = agents.EinoClient

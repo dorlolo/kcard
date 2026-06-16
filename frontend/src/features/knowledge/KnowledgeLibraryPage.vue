@@ -9,6 +9,7 @@ import {
   listKnowledgePoints,
   mergeKnowledgePoints,
   splitKnowledgePoint,
+  updateKnowledgePoint,
   type KnowledgeGraph,
   type KnowledgePoint
 } from '../../services/knowledge'
@@ -66,6 +67,11 @@ async function saveRelationship(input: { relationshipType: string; label: string
   await loadKnowledge()
 }
 
+async function updateStatus(point: KnowledgePoint, status: KnowledgePoint['approvalStatus']) {
+  await updateKnowledgePoint(point.id, { approvalStatus: status })
+  await loadKnowledge()
+}
+
 function selectGraphNode(id: string) {
   if (!selectedNodeId.value || selectedNodeId.value === id) selectedNodeId.value = id
   else targetNodeId.value = id
@@ -106,7 +112,7 @@ onMounted(loadKnowledge)
         <h3>{{ point.summary || point.content }}</h3>
         <p>{{ point.content }}</p>
         <div class="tag-chip-row"><span class="tag-chip">{{ point.approvalStatus }}</span><span v-for="tag in point.tags" :key="tag.id || tag.name" class="tag-chip">{{ tag.name }}</span><span v-if="point.duplicateGroupId" class="tag-chip">可能重复</span></div>
-        <div class="item-actions"><button type="button" @click="selectedIds = [point.id]; dialogMode = 'split'">拆分</button><button type="button" :disabled="selectedIds.length < 2" @click="dialogMode = 'merge'">合并所选</button><button type="button" @click="selectGraphNode(point.id)">查看图谱</button></div>
+        <div class="item-actions"><button type="button" @click="updateStatus(point, 'approved')">批准</button><button type="button" @click="updateStatus(point, 'rejected')">拒绝</button><button type="button" @click="updateStatus(point, 'needs_review')">待复核</button><button type="button" @click="selectedIds = [point.id]; dialogMode = 'split'">拆分</button><button type="button" :disabled="selectedIds.length < 2" @click="dialogMode = 'merge'">合并所选</button><button type="button" @click="selectGraphNode(point.id)">查看图谱</button></div>
       </article>
       <p v-if="!filtered.length && !loading" class="state-view" data-state="empty">暂无匹配知识点，请调整筛选条件。</p>
     </div>

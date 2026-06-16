@@ -1,5 +1,7 @@
+// Package domain 提供提示词预设相关类型。
 package domain
 
+// PromptPreset 表示用户定义的提示词预设。
 type PromptPreset struct {
 	ID                 ID
 	LearnerWorkspaceID ID
@@ -9,6 +11,7 @@ type PromptPreset struct {
 	IsDefault          bool
 	VersionNumber      int
 }
+// PromptSnapshot 表示提示词在某个时刻的快照。
 type PromptSnapshot struct {
 	ID              ID
 	PromptPresetID  ID

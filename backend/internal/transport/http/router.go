@@ -8,17 +8,19 @@ import (
 
 	"kcardDesgin/backend/internal/app"
 	"kcardDesgin/backend/internal/domain"
+	"kcardDesgin/backend/internal/jobs"
 	"kcardDesgin/backend/internal/repository"
 	"kcardDesgin/backend/internal/service"
 	"kcardDesgin/backend/internal/transport/http/middleware"
 )
 
+// NewRouter 创建并配置Gin引擎，注册所有API路由和中间件。
 func NewRouter(container *app.Container) *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Recovery(), requestID(), cors(container.Config.AllowedFrontendOrigin), middleware.PlaceholderAuth())
 	r.GET("/api/v1/health", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"status": "ok", "time": time.Now().UTC()}) })
 	api := r.Group("/api/v1")
-	RegisterMaterialRoutes(api, MaterialHandler{Service: service.MaterialService{Store: &service.MemoryMaterialStore{}, Jobs: &service.MemoryJobEnqueuer{}}})
+	RegisterMaterialRoutes(api, newMaterialHandler(container))
 	RegisterKnowledgeRoutes(api, newKnowledgeHandler(container))
 	RegisterCardRoutes(api, CardHandler{})
 	RegisterReviewRoutes(api, ReviewHandler{})
@@ -27,6 +29,15 @@ func NewRouter(container *app.Container) *gin.Engine {
 	RegisterPortabilityRoutes(api, PortabilityHandler{})
 	r.NoRoute(func(c *gin.Context) { Error(c, http.StatusNotFound, "not_found", "route not found") })
 	return r
+}
+
+func newMaterialHandler(container *app.Container) MaterialHandler {
+	if container != nil && container.DB != nil && container.Redis != nil {
+		materialRepo := repository.NewMaterialRepository(container.DB)
+		queue := jobs.NewQueue(container.Redis, jobs.DefaultQueueName)
+		return MaterialHandler{Service: service.MaterialService{Store: materialRepo, Jobs: jobs.NewMaterialAnalysisEnqueuer(queue)}}
+	}
+	return MaterialHandler{Service: service.MaterialService{Store: &service.MemoryMaterialStore{}, Jobs: &service.MemoryJobEnqueuer{}}}
 }
 
 func newKnowledgeHandler(container *app.Container) KnowledgeHandler {
@@ -74,6 +85,7 @@ func cors(origin string) gin.HandlerFunc {
 	}
 }
 
+// Error 发送JSON格式的错误响应。
 func Error(c *gin.Context, status int, code, message string) {
 	c.JSON(status, gin.H{"error": gin.H{"code": code, "message": message}})
 }

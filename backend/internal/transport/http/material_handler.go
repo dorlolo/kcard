@@ -10,6 +10,7 @@ import (
 	"kcardDesgin/backend/internal/transport/http/middleware"
 )
 
+// MaterialHandler 处理资料导入相关的HTTP请求。
 type MaterialHandler struct{ Service service.MaterialService }
 
 type createMaterialRequest struct {
@@ -21,18 +22,14 @@ type createMaterialRequest struct {
 	DuplicatePolicy string   `json:"duplicatePolicy"`
 }
 
-type updateKnowledgePointRequest struct {
-	ApprovalStatus string `json:"approvalStatus"`
-	Notes          string `json:"notes"`
-}
-
+// RegisterMaterialRoutes 注册资料相关的HTTP路由。
 func RegisterMaterialRoutes(r gin.IRoutes, handler MaterialHandler) {
 	r.POST("/materials", handler.Create)
 	r.GET("/materials/:materialId", handler.Get)
 	r.POST("/materials/:materialId/reanalyze", handler.Reanalyze)
-	r.PATCH("/knowledge-points/:knowledgePointId", handler.UpdateKnowledgePoint)
 }
 
+// Create 创建新的学习资料并触发分析任务。
 func (h MaterialHandler) Create(c *gin.Context) {
 	var req createMaterialRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -52,14 +49,16 @@ func (h MaterialHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusAccepted, gin.H{"material": result.Material, "job": gin.H{"id": result.JobID, "jobType": "material_analysis", "status": "queued", "progressPercent": 0, "currentStep": "queued"}})
 }
 
+// Get 获取指定资料的详细信息。
 func (h MaterialHandler) Get(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"id": c.Param("materialId"), "processingStatus": "queued", "tags": []string{}})
+	material, err := h.Service.Get(c.Request.Context(), getWorkspaceID(c), domain.ID(c.Param("materialId")))
+	if err != nil {
+		Error(c, http.StatusNotFound, "material_not_found", err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, material)
 }
+// Reanalyze 触发资料重新分析任务。
 func (h MaterialHandler) Reanalyze(c *gin.Context) {
 	c.JSON(http.StatusAccepted, gin.H{"job": gin.H{"id": c.Param("materialId") + ":reanalysis", "jobType": "material_analysis", "status": "queued", "progressPercent": 0, "currentStep": "queued"}})
-}
-func (h MaterialHandler) UpdateKnowledgePoint(c *gin.Context) {
-	var req updateKnowledgePointRequest
-	_ = c.ShouldBindJSON(&req)
-	c.JSON(http.StatusOK, gin.H{"id": c.Param("knowledgePointId"), "approvalStatus": req.ApprovalStatus, "notes": req.Notes})
 }
